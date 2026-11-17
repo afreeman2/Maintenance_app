@@ -72,22 +72,22 @@
       <Generator>MSDataSetGenerator</Generator>
       <LastGenOutput>sub_data.Designer.cs</LastGenOutput>
     </None>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
     <!-- قالب الإحصائية مطلوب في نسخ التشغيل والمثبّت مثل قوالب RDLC. -->
     <None Update="Reports\chart_report.repx" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <!-- قالب كشف الصيانة يتلقى نتائج البحث من التطبيق عند المعاينة. -->
     <None Update="Reports\Maint_grop.repx" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <!-- ملفات مستقلة للتجميع وكشف الرؤوس المختصر، تُنسخ مع التطبيق عند البناء والنشر. -->
-    <None Update="Reports\Maint_grop_date.repx;Reports\Maint_grop_Build.repx;Reports\Maint_grop_Technician.repx;Reports\Maint_grop_HeaderOnly.repx"
-          CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Update="Reports\Maint_grop_date.repx;Reports\Maint_grop_Build.repx;Reports\Maint_grop_Technician.repx;Reports\Maint_grop_HeaderOnly.repx" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <!-- كشف الفروع التفصيلي وجدول الرؤوس المجمع بالفرع يرافقان نسخ التشغيل والنشر. -->
-    <None Update="Reports\Maint_grop_Branch.repx;Reports\Maint_grop_HeadersByBranch.repx"
-          CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Update="Reports\Maint_grop_Branch.repx;Reports\Maint_grop_HeadersByBranch.repx" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <!-- قوالب التكليف والمواد والإنهاء ترافق نسخ البناء والنشر. -->
-    <None Update="Reports\Mainte_Report.repx;Reports\parts.repx;Reports\Done_Mainte_Report.repx"
-          CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Update="Reports\Mainte_Report.repx;Reports\parts.repx;Reports\Done_Mainte_Report.repx" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <!-- نافذتا الفحص اليومي تقرآن نسختي REPX عند الطباعة. -->
-    <None Update="Reports\new_Daly_Check.repx;Reports\new_Daly_Check_serv.repx"
-          CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Update="Reports\new_Daly_Check.repx;Reports\new_Daly_Check_serv.repx" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <!-- قالب الفحص اليومي كما هو في مصدر المنظومة القديمة المعتمد. -->
     <None Include="D:\GitHub\Maintenance_services\Maintenance_services\bin\x64\Release\Reports\new_Daly_Check.rdlc" Link="Reports\new_Daly_Check.rdlc" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <!-- قوالب كشف الصيانة المعتمدة في المنظومة القديمة؛ تربط كما هي للطباعة دون إعادة تصميمها. -->
@@ -132,6 +132,11 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
   </ItemGroup>
 
