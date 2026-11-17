@@ -1,0 +1,57 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <NuGetAudit>false</NuGetAudit>
+    <StartupObject>Program</StartupObject>
+    <StartupObject Condition="'$(LaunchProbe)' == 'true'">LaunchProbe</StartupObject>
+    <StartupObject Condition="'$(PalettePreview)' == 'true'">PalettePreview</StartupObject>
+    <StartupObject Condition="'$(TechnicianProbe)' == 'true'">TechnicianSelectionProbe</StartupObject>
+    <StartupObject Condition="'$(MessageProbe)' == 'true'">MessageAutomationProbe</StartupObject>
+    <StartupObject Condition="'$(ValidationProbe)' == 'true'">OrderValidationProbe</StartupObject>
+    <StartupObject Condition="'$(NotificationsProbe)' == 'true'">NotificationsProbe</StartupObject>
+    <StartupObject Condition="'$(CompletionProbe)' == 'true'">CompletionProbe</StartupObject>
+    <StartupObject Condition="'$(NotificationRoutingProbe)' == 'true'">NotificationRoutingProbe</StartupObject>
+    <StartupObject Condition="'$(StatisticsProbe)' == 'true'">StatisticsProbe</StartupObject>
+    <StartupObject Condition="'$(FlyoutProbe)' == 'true'">FlyoutProbe</StartupObject>
+    <StartupObject Condition="'$(RepairSelectionProbe)' == 'true'">RepairSelectionProbe</StartupObject>
+    <StartupObject Condition="'$(DeleteRowProbe)' == 'true'">DeleteRowProbe</StartupObject>
+    <StartupObject Condition="'$(SearchResetProbe)' == 'true'">SearchResetProbe</StartupObject>
+    <StartupObject Condition="'$(RequestNotificationsProbe)' == 'true'">RequestNotificationsProbe</StartupObject>
+    <StartupObject Condition="'$(RequestAppearanceProbe)' == 'true'">RequestAppearanceProbe</StartupObject>
+    <StartupObject Condition="'$(ReportsProbe)' == 'true'">ReportsProbe</StartupObject>
+    <StartupObject Condition="'$(DailyInspectionProbe)' == 'true'">DailyInspectionProbe</StartupObject>
+    <EnableDefaultCompileItems Condition="'$(DailyInspectionProbe)' == 'true' or '$(FlyoutProbe)' == 'true'">false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(DailyInspectionProbe)' == 'true'">
+    <!-- يعزل فحص النموذج عن فحوص قديمة لم تُحدّث بعد تعديلات نماذج المستخدم. -->
+    <Compile Include="DailyInspectionProbe.cs"/>
+  </ItemGroup>
+  <ItemGroup Condition="'$(FlyoutProbe)' == 'true'">
+    <Compile Include="FlyoutProbe.cs"/>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="DevExpress.Wpf.Grid.Core" Version="26.1.6" />
+    <PackageReference Include="DevExpress.Wpf.Themes.Win11Light" Version="26.1.6" />
+    <PackageReference Include="ReportViewerCore.WinForms" Version="15.1.33" />
+    <PackageReference Include="MahApps.Metro" Version="2.4.11" />
+    <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="6.2.1" />
+    <PackageReference Include="MahApps.Metro.IconPacks.MaterialDesign" Version="6.2.1" />
+    <PackageReference Include="MahApps.Metro.IconPacks.BootstrapIcons" Version="6.2.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.6" />
+    <Reference Include="Maintenance_app">
+      <HintPath>$(ApplicationBin)\Maintenance_app.dll</HintPath>
+    </Reference>
+    <None Include="../../Maintenance_app/Reports/*.rdlc" Link="Reports/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../Maintenance_app/Reports/chart_report.repx" Link="Reports/chart_report.repx" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="D:\GitHub\Maintenance_services\Maintenance_services\bin\x64\Release\Reports\new_Daly_Check.rdlc" Link="Reports\new_Daly_Check.rdlc" CopyToOutputDirectory="PreserveNewest" />
+    <!-- نفس قوالب الكشوف الموروثة التي تستخدمها نافذة التقارير؛ تُنسخ للاختبار كي نتحقق من التصدير فعليًا. -->
+    <None Include="D:\GitHub\Maintenance_services\Maintenance_services\bin\Debug\Reports\Maint_grop.rdlc" Link="Reports\Maint_grop.rdlc" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="D:\GitHub\Maintenance_services\Maintenance_services\bin\Debug\Reports\Maint_grop_date.rdlc" Link="Reports\Maint_grop_date.rdlc" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="D:\GitHub\Maintenance_services\Maintenance_services\bin\Debug\Reports\Maint_grop_Build.rdlc" Link="Reports\Maint_grop_Build.rdlc" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

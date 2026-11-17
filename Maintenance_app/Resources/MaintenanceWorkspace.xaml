@@ -1,0 +1,73 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core">
+    <!-- لوحة كحلية وزرقاء للرئيسية حسب اختيار المستخدم، مع درجات مستقلة للنص والأسطح والأزرار. -->
+    <SolidColorBrush x:Key="Workspace.Surface" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="Workspace.Line" Color="#DFE5EF"/>
+    <SolidColorBrush x:Key="Workspace.Ink" Color="#1B2B47"/>
+    <SolidColorBrush x:Key="Workspace.Muted" Color="#6B7890"/>
+    <SolidColorBrush x:Key="Workspace.Primary" Color="#314D7A"/>
+    <SolidColorBrush x:Key="Workspace.Tint" Color="#EEF2F9"/>
+    <SolidColorBrush x:Key="Workspace.Copper" Color="#9C763A"/>
+    <LinearGradientBrush x:Key="Workspace.Header" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="#111D33" Offset="0"/>
+        <GradientStop Color="#203656" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="Workspace.Canvas" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#F6F7FB" Offset="0"/>
+        <GradientStop Color="#F9FAFD" Offset="0.58"/>
+        <GradientStop Color="#EDF1F7" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="Workspace.Feature" StartPoint="0,1" EndPoint="1,0">
+        <GradientStop Color="#14233F" Offset="0"/>
+        <GradientStop Color="#20385D" Offset="0.67"/>
+        <GradientStop Color="#294976" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- خطوط معمارية واسعة وخافتة تغطي الخلفية دون تكرار نقاط أو تمديد صورة. -->
+    <DrawingBrush x:Key="Workspace.Pattern" Stretch="UniformToFill" ViewboxUnits="Absolute" Viewbox="0,0,1600,900">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="Transparent" Geometry="M0,0 H1600 V900 H0 Z"/>
+                <GeometryDrawing Geometry="M-80,660 L530,50 M-30,740 L660,50 M1100,940 L1670,370 M1220,940 L1670,490">
+                    <GeometryDrawing.Pen><Pen Brush="#0B41618E" Thickness="1"/></GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Geometry="M-80,700 C180,330 420,580 590,220 M1130,960 C1300,590 1430,720 1670,390">
+                    <GeometryDrawing.Pen><Pen Brush="#12B18C4D" Thickness="2"/></GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <Style x:Key="Workspace.Tab" TargetType="RadioButton">
+        <Setter Property="Foreground" Value="{StaticResource Workspace.Muted}"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Padding" Value="20,10"/>
+        <Setter Property="Margin" Value="3,4"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RadioButton">
+                    <Border x:Name="TabSurface" Background="Transparent" BorderBrush="Transparent"
+                            BorderThickness="1" CornerRadius="7" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter RecognizesAccessKey="True"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="TabSurface" Property="Background" Value="#EEF3FA"/>
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter Property="Foreground" Value="{StaticResource Workspace.Primary}"/>
+                            <Setter TargetName="TabSurface" Property="Background" Value="{StaticResource Workspace.Tint}"/>
+                            <Setter TargetName="TabSurface" Property="BorderBrush" Value="{StaticResource Workspace.Line}"/>
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="TabSurface" Property="BorderBrush" Value="{StaticResource Workspace.Primary}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

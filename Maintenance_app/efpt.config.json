@@ -1,0 +1,118 @@
+{
+   "CodeGenerationMode": 6,
+   "ContextClassName": "Maintenance_Aggregated_DabaseContext",
+   "ContextNamespace": null,
+   "FilterSchemas": false,
+   "IncludeConnectionString": false,
+   "IrregularWords": null,
+   "MinimumProductVersion": "2.6.1604",
+   "ModelNamespace": null,
+   "OutputContextPath": "dbContext_Aggregated",
+   "OutputPath": "Models_Aggregated",
+   "PluralRules": null,
+   "PreserveCasingWithRegex": true,
+   "ProjectRootNamespace": "Maintenance_app",
+   "Schemas": null,
+   "SelectedHandlebarsLanguage": 2,
+   "SelectedToBeGenerated": 0,
+   "SingularRules": null,
+   "T4TemplatePath": null,
+   "Tables": [
+      {
+         "Name": "[dbo].[T_Branch]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[T_Build]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[T_Emergency_MaintenanceCosts]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[T_Emergency_MaintenanceCosts_Services]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[T_Emp_Maint]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[T_Employe]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[T_FinishedMaintenance]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[T_Locations]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[T_MaintenanceCosts]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[T_MaintenanceCosts_Parts]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[T_Manage]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[T_Section]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[T_Service]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[v_chart]",
+         "ObjectType": 3
+      },
+      {
+         "Name": "[dbo].[v_man_searche]",
+         "ObjectType": 3
+      },
+      {
+         "Name": "[dbo].[GetEmploye]",
+         "ObjectType": 2
+      },
+      {
+         "Name": "[dbo].[GetSirevce]",
+         "ObjectType": 2
+      }
+   ],
+   "UiHint": null,
+   "UncountableWords": null,
+   "UseAsyncStoredProcedureCalls": true,
+   "UseBoolPropertiesWithoutDefaultSql": false,
+   "UseDatabaseNames": false,
+   "UseDatabaseNamesForRoutines": true,
+   "UseDateOnlyTimeOnly": true,
+   "UseDbContextSplitting": false,
+   "UseDecimalDataAnnotationForSprocResult": true,
+   "UseFluentApiOnly": true,
+   "UseHandleBars": false,
+   "UseHierarchyId": false,
+   "UseInflector": true,
+   "UseInternalAccessModifiersForSprocsAndFunctions": false,
+   "UseLegacyPluralizer": false,
+   "UseManyToManyEntity": true,
+   "UseNoDefaultConstructor": false,
+   "UseNoNavigations": false,
+   "UseNoObjectFilter": false,
+   "UseNodaTime": false,
+   "UseNullableReferences": false,
+   "UsePrefixNavigationNaming": false,
+   "UseSchemaFolders": false,
+   "UseSchemaNamespaces": false,
+   "UseSpatial": false,
+   "UseT4": false,
+   "UseT4Split": false,
+   "UseTypedTvpParameters": true
+}

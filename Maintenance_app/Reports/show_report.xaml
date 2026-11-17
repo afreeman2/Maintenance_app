@@ -1,0 +1,73 @@
+﻿<mah:MetroWindow x:Class="Maintenance_app.Reports.show_report"
+       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+xmlns:icons="http://metro.mahapps.com/winfx/xaml/iconpacks"
+xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+ xmlns:dxp="http://schemas.devexpress.com/winfx/2008/xaml/printing"
+ xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+ Background="Transparent" AllowsTransparency="False" WindowStyle="None" ShowTitleBar="False"
+                 ShowCloseButton="False"
+ WindowState="Maximized" WindowStartupLocation="CenterOwner" ResizeMode="CanResize" ShowMinButton="False" ShowMaxRestoreButton="False"
+ MinWidth="700" MinHeight="520" ShowInTaskbar="False" PreviewKeyDown="Window_PreviewKeyDown"
+FlowDirection="RightToLeft" dx:ThemeManager.ThemeName="Win11Light">
+    <mah:MetroWindow.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Maintenance_app;component/Resources/AccountTheme.xaml" />
+                <ResourceDictionary Source="/Maintenance_app;component/Resources/StaticChoices.xaml" />
+                <ResourceDictionary Source="/Maintenance_app;component/Resources/AccessibleEditors.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </mah:MetroWindow.Resources>
+    <!-- يشترك عارضا RDLC وDevExpress في ترويسة نافذة المعاينة المستقلة. -->
+    <Border Style="{StaticResource Account.Card}" Margin="8">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Border Background="{StaticResource Order.Hero}" CornerRadius="17,17,0,0" Padding="18,8">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <icons:PackIconMaterial Kind="PrinterOutline" Width="24" Height="24" Foreground="#EACD8C" Margin="0,0,10,0"/>
+                        <TextBlock Text="{Binding Title, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   FontSize="20" Foreground="White" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <dx:SimpleButton Grid.Column="1" Click="Close_Click" ToolTip="إغلاق" AutomationProperties.Name="إغلاق المعاينة"
+                                     Width="40" Height="38" Background="White">
+                        <icons:PackIconMaterial Kind="Close" Width="18" Height="18"/>
+                    </dx:SimpleButton>
+                </Grid>
+            </Border>
+            <DockPanel x:Name="RdlcPreview" Grid.Row="1" LastChildFill="True" Margin="8">
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="12,6,12,10">
+                    <dxe:ComboBoxEdit x:Name="ExportFormats" Template="{StaticResource Accessible.EditorTemplate}" Width="160" Height="34" Margin="8,0"
+                           IsTextEditable="False" SelectedIndex="0" ItemTemplate="{StaticResource StaticChoice.Template}"
+                           AutomationProperties.Name="صيغة تصدير التقرير">
+                        <dxe:ComboBoxEdit.ItemsSource>
+                            <x:Array Type="{x:Type sys:String}">
+                                <sys:String>PDF</sys:String>
+                                <sys:String>Excel</sys:String>
+                                <sys:String>Word</sys:String>
+                            </x:Array>
+                        </dxe:ComboBoxEdit.ItemsSource>
+                    </dxe:ComboBoxEdit>
+                    <dx:SimpleButton x:Name="ExportButton" Click="Export_Click" Height="34" Padding="14,0" AutomationProperties.Name="تصدير التقرير">
+                        <StackPanel Orientation="Horizontal">
+                            <icons:PackIconMaterial Kind="Export" Width="18" Height="18" Margin="0,0,8,0" />
+                            <TextBlock Text="تصدير التقرير" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </dx:SimpleButton>
+                    <TextBlock Text="الطباعة والتنقل والتكبير من شريط المعاينة" VerticalAlignment="Center" Margin="12,0" />
+                </StackPanel>
+                <!-- اتجاه الورقة يبقى كما أنتجه قالب RDLC العربي دون عكس محتواها. -->
+                <DocumentViewer x:Name="PreviewViewer" FlowDirection="LeftToRight" />
+            </DockPanel>
+            <dxp:DocumentPreviewControl x:Name="StatisticsViewer" Grid.Row="1" Margin="8" Visibility="Collapsed"/>
+        </Grid>
+    </Border>
+
+</mah:MetroWindow>

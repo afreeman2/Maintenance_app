@@ -1,0 +1,650 @@
+<mah:MetroWindow x:Class="Maintenance_app.reports.MaintenanceReportsWindow"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls" 
+                 xmlns:local2="clr-namespace:Maintenance_app.viewo_Model"
+                 xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+                 xmlns:dxp="http://schemas.devexpress.com/winfx/2008/xaml/printing"
+ xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+                 xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+ xmlns:icons="http://metro.mahapps.com/winfx/xaml/iconpacks"
+ xmlns:orders="clr-namespace:Maintenance_app.orders_Windows"
+ xmlns:reports="clr-namespace:Maintenance_app.reports"
+                                  xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+
+                                   DataContext="{dxmvvm:ViewModelSource Type={x:Type local2:maint_reports_viewomodel}}"
+
+ xmlns:sys="clr-namespace:System;assembly=System.Runtime" Title="تقارير الصيانة" FlowDirection="RightToLeft"
+ WindowState="Maximized" WindowStartupLocation="CenterOwner" ResizeMode="CanResize" Width="1300" Height="790" MinWidth="1060" MinHeight="620"
+ FlyoutOverlayBrush="#90182948" PreviewKeyDown="Window_PreviewKeyDown" StateChanged="Window_StateChanged" 
+                 ShowCloseButton="False"
+                 ShowMinButton="False" ShowMaxRestoreButton="False"
+                 AllowsTransparency="True" Background="Transparent"
+                   ShowTitleBar="False" WindowStyle="None" BorderThickness="0" 
+   dx:ThemeManager.ThemeName="Win11Light" Loaded="Window_Loaded">
+ <mah:MetroWindow.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries>
+   <ResourceDictionary Source="/Maintenance_app;component/Resources/StaticChoices.xaml"/>
+     <ResourceDictionary Source="/Maintenance_app;component/Resources/MaintenanceFlyouts.xaml"/>
+ </ResourceDictionary.MergedDictionaries>
+   <reports:AssignmentHeaderLayoutConverter x:Key="Report.AssignmentHeaderLayout"/>
+   <!-- أزرار الأوامر موحّدة وواضحة: رئيسي للعرض، ذهبي للطباعة، وثانوي لمسح الشروط. -->
+   <Style x:Key="Report.Button" TargetType="dx:SimpleButton"><Setter Property="Height" Value="44"/><Setter Property="MinWidth" Value="126"/><Setter Property="Margin" Value="5"/><Setter Property="Padding" Value="16,0"/><Setter Property="FontSize" Value="14"/><Setter Property="FontWeight" Value="SemiBold"/><Setter Property="BorderThickness" Value="1"/></Style>
+   <Style x:Key="Report.ShowButton" TargetType="dx:SimpleButton" BasedOn="{StaticResource Report.Button}"><Setter Property="Background" Value="#244A7C"/><Setter Property="Foreground" Value="White"/><Setter Property="BorderBrush" Value="#17385F"/></Style>
+   <Style x:Key="Report.PrintButton" TargetType="dx:SimpleButton" BasedOn="{StaticResource Report.Button}"><Setter Property="Background" Value="#D2AB61"/><Setter Property="Foreground" Value="#1D385C"/><Setter Property="BorderBrush" Value="#B58A3D"/></Style>
+   <Style x:Key="Report.ClearButton" TargetType="dx:SimpleButton" BasedOn="{StaticResource Report.Button}"><Setter Property="Background" Value="White"/><Setter Property="Foreground" Value="#385573"/><Setter Property="BorderBrush" Value="#B8C8DC"/></Style>
+   <Style x:Key="Report.Toggle" TargetType="CheckBox"><Setter Property="FontWeight" Value="SemiBold"/><Setter Property="Foreground" Value="#213F6A"/><Setter Property="VerticalContentAlignment" Value="Center"/><Setter Property="Margin" Value="0,0,8,0"/></Style>
+   <!-- تبقى الخانة المعبأة أغمق، ويُعرض خطأ التحقق على الخانة نفسها. -->
+   <Style x:Key="Report.Editor" TargetType="dxe:BaseEdit">
+     <Setter Property="Height" Value="40"/>
+     <Setter Property="HorizontalContentAlignment" Value="Center"/>
+     <Setter Property="Background" Value="#E3ECF8"/>
+     <Setter Property="Validation.ErrorTemplate" Value="{DynamicResource errorTemplateSilverlightStyle}"/>
+     <Style.Triggers>
+       <Trigger Property="EditValue" Value="{x:Null}"><Setter Property="Background" Value="White"/></Trigger>
+       <Trigger Property="Validation.HasError" Value="True">
+         <Setter Property="BorderBrush" Value="#C12732"/>
+         <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)[0].ErrorContent}"/>
+       </Trigger>
+     </Style.Triggers>
+   </Style>
+   <!-- توسيط خلايا وعناوين التقرير العربية. -->
+   <!-- سياق CellTemplate هو EditGridCellData؛ الربط الصريح بـ Value يمنع ظهور صفوف فارغة عند استخدام محرر مخصص. -->
+   <DataTemplate x:Key="Report.CenteredCell"><TextBlock Text="{Binding Value}" TextAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Stretch" TextWrapping="Wrap" Foreground="#213F6A" Padding="6,2"/></DataTemplate>
+   <Style x:Key="Report.ColumnTitleButton" TargetType="Button">
+     <Setter Property="Background" Value="Transparent"/>
+     <Setter Property="Foreground" Value="White"/>
+     <Setter Property="HorizontalContentAlignment" Value="Center"/>
+     <Setter Property="VerticalContentAlignment" Value="Center"/>
+     <Setter Property="Template">
+       <Setter.Value>
+         <ControlTemplate TargetType="Button">
+           <Border x:Name="Surface" Background="{TemplateBinding Background}" CornerRadius="4">
+             <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+           </Border>
+           <ControlTemplate.Triggers>
+             <Trigger Property="IsMouseOver" Value="True">
+               <Setter TargetName="Surface" Property="Background" Value="#2B4873"/>
+             </Trigger>
+             <Trigger Property="IsKeyboardFocused" Value="True">
+               <Setter TargetName="Surface" Property="Background" Value="#2B4873"/>
+             </Trigger>
+           </ControlTemplate.Triggers>
+         </ControlTemplate>
+       </Setter.Value>
+     </Setter>
+   </Style>
+   <!-- يظل اسم الفرع وإجمالياته ظاهرين فوق بطاقات تكليفاته وبجوار زر الطي والتوسيع. -->
+   <DataTemplate x:Key="Report.BranchGroup">
+     <Border Background="#DDE9F7" BorderBrush="#C8D7EB" BorderThickness="1" CornerRadius="8"
+             Padding="8,6" Margin="5,4">
+       <Grid>
+         <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+         <dxg:GridGroupExpandButton IsChecked="{Binding IsRowExpanded}" Command="{Binding View.Commands.ChangeGroupExpanded}"
+                                    CommandParameter="{Binding RowHandle.Value}" Margin="3,0,8,0"
+                                    AutomationProperties.Name="طي أو توسيع تكليفات الفرع"/>
+         <TextBlock Grid.Column="1" Text="{Binding GroupValue.DisplayText}" FontWeight="Bold"
+                    Foreground="#213F6A" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+         <ItemsControl Grid.Column="2" ItemsSource="{Binding GroupSummaryData}" VerticalAlignment="Center">
+           <ItemsControl.ItemsPanel>
+             <ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate>
+           </ItemsControl.ItemsPanel>
+           <ItemsControl.ItemTemplate>
+             <DataTemplate>
+               <TextBlock Text="{Binding Text}" Margin="14,0,0,0" FontWeight="SemiBold" Foreground="#213F6A"/>
+             </DataTemplate>
+           </ItemsControl.ItemTemplate>
+         </ItemsControl>
+       </Grid>
+     </Border>
+   </DataTemplate>
+   <!-- قالب صف المجموعة يحتفظ بزر الطي والتوسيع ويملأ عرض الجدول. -->
+   <DataTemplate x:Key="Report.AssignmentGroup">
+     <Grid>
+       <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+       <Grid.RowDefinitions>
+         <RowDefinition Height="14"/>
+         <RowDefinition Height="Auto"/>
+         <RowDefinition Height="Auto"/>
+       </Grid.RowDefinitions>
+       <!-- يَفصل الفراغ كل تكليف عن بنود التكليف السابق ويظل واضحًا عند تحديد المجموعة. -->
+       <Border Grid.ColumnSpan="2" Background="White" IsHitTestVisible="False"/>
+       <dxg:GridGroupExpandButton Grid.Row="1" IsChecked="{Binding IsRowExpanded}" Command="{Binding View.Commands.ChangeGroupExpanded}"
+                                  CommandParameter="{Binding RowHandle.Value}" VerticalAlignment="Top" Margin="4,12,2,0"
+                                  AutomationProperties.Name="طي أو توسيع بيان التكليف"/>
+       <ContentControl Grid.Row="1" Grid.Column="1" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
+                       ContentTemplate="{DynamicResource Report.AssignmentHeader}"
+                       Tag="{Binding GroupValue.Value, NotifyOnTargetUpdated=True}"
+                       Loaded="AssignmentHeader_Loaded" Unloaded="AssignmentHeader_Unloaded"
+                       TargetUpdated="AssignmentHeader_TargetUpdated"/>
+       <!-- شريط العناوين يتبع ترتيب وأبعاد أعمدة الجدول ويظهر مباشرة قبل بنود المجموعة. -->
+       <ItemsControl Grid.Row="2" Grid.ColumnSpan="2" ItemsSource="{Binding View.VisibleColumns}"
+                     Background="#182A50" ClipToBounds="True">
+         <ItemsControl.Style>
+           <Style TargetType="ItemsControl">
+             <Setter Property="Visibility" Value="Collapsed"/>
+             <Style.Triggers>
+               <DataTrigger Binding="{Binding IsRowExpanded}" Value="True">
+                 <Setter Property="Visibility" Value="Visible"/>
+               </DataTrigger>
+             </Style.Triggers>
+           </Style>
+         </ItemsControl.Style>
+         <ItemsControl.ItemsPanel>
+           <ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate>
+         </ItemsControl.ItemsPanel>
+         <ItemsControl.ItemTemplate>
+           <DataTemplate>
+             <Border MinHeight="32" BorderBrush="#4D6794" BorderThickness="0,0,1,1">
+               <Border.Width>
+                 <MultiBinding Converter="{StaticResource Report.AssignmentHeaderLayout}">
+                   <Binding Path="DataContext.View.TotalGroupAreaIndent" RelativeSource="{RelativeSource AncestorType={x:Type ItemsControl}}"/>
+                   <Binding Path="DataContext.GroupLevel" RelativeSource="{RelativeSource AncestorType={x:Type ItemsControl}}"/>
+                   <Binding Path="ActualHeaderWidth"/>
+                   <Binding Path="ActualVisibleIndex"/>
+                 </MultiBinding>
+               </Border.Width>
+               <Grid>
+                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                 <!-- موضع الرأس يتضمن إزاحة المجموعات الأب، فنضيف فقط إزاحة مستوى التكليف. -->
+                 <Border>
+                   <Border.Width>
+                     <MultiBinding Converter="{StaticResource Report.AssignmentHeaderLayout}">
+                       <Binding Path="DataContext.View.TotalGroupAreaIndent" RelativeSource="{RelativeSource AncestorType={x:Type ItemsControl}}"/>
+                       <Binding Path="DataContext.GroupLevel" RelativeSource="{RelativeSource AncestorType={x:Type ItemsControl}}"/>
+                     </MultiBinding>
+                   </Border.Width>
+                   <Border.Style>
+                     <Style TargetType="Border">
+                       <Setter Property="Visibility" Value="Collapsed"/>
+                       <Style.Triggers>
+                         <DataTrigger Binding="{Binding ActualVisibleIndex}" Value="0">
+                           <Setter Property="Visibility" Value="Visible"/>
+                         </DataTrigger>
+                       </Style.Triggers>
+                     </Style>
+                   </Border.Style>
+                 </Border>
+                 <Grid Grid.Column="1">
+                   <Button Content="{Binding Header}" Command="{Binding Commands.ChangeColumnSortOrder}"
+                           FontSize="13" FontWeight="SemiBold" Style="{StaticResource Report.ColumnTitleButton}"/>
+                   <icons:PackIconMaterial Width="14" Height="14" Margin="8,0" HorizontalAlignment="Left"
+                                           Foreground="#C7D9F3" IsHitTestVisible="False">
+                     <icons:PackIconMaterial.Style>
+                       <Style TargetType="icons:PackIconMaterial">
+                         <Setter Property="Visibility" Value="Collapsed"/>
+                         <Style.Triggers>
+                           <DataTrigger Binding="{Binding SortOrder}" Value="Ascending">
+                             <Setter Property="Kind" Value="ArrowUp"/>
+                             <Setter Property="Visibility" Value="Visible"/>
+                           </DataTrigger>
+                           <DataTrigger Binding="{Binding SortOrder}" Value="Descending">
+                             <Setter Property="Kind" Value="ArrowDown"/>
+                             <Setter Property="Visibility" Value="Visible"/>
+                           </DataTrigger>
+                         </Style.Triggers>
+                       </Style>
+                     </icons:PackIconMaterial.Style>
+                   </icons:PackIconMaterial>
+                   <Button Width="28" Height="26" Margin="3,0" HorizontalAlignment="Right"
+                           ToolTip="تصفية العمود" AutomationProperties.Name="تصفية العمود"
+                           Click="AssignmentColumnFilter_Click"
+                           Style="{StaticResource Report.ColumnTitleButton}">
+                     <icons:PackIconMaterial Kind="FilterOutline" Width="14" Height="14">
+                       <icons:PackIconMaterial.Style>
+                         <Style TargetType="icons:PackIconMaterial">
+                           <Setter Property="Foreground" Value="#C7D9F3"/>
+                           <Style.Triggers>
+                             <DataTrigger Binding="{Binding IsFiltered}" Value="True">
+                               <Setter Property="Foreground" Value="#F2C979"/>
+                             </DataTrigger>
+                           </Style.Triggers>
+                         </Style>
+                       </icons:PackIconMaterial.Style>
+                     </icons:PackIconMaterial>
+                   </Button>
+                 </Grid>
+               </Grid>
+             </Border>
+           </DataTemplate>
+         </ItemsControl.ItemTemplate>
+       </ItemsControl>
+     </Grid>
+   </DataTemplate>
+   <!-- الأيقونة والنص يتوسطان الخلية كوحدة واحدة وتلتف التفاصيل الطويلة عند ضيق العمود. -->
+   <Style x:Key="Report.DetailIcon" TargetType="icons:PackIconMaterial">
+     <Setter Property="Width" Value="15"/>
+     <Setter Property="Height" Value="15"/>
+     <Setter Property="Foreground" Value="#396796"/>
+     <Setter Property="VerticalAlignment" Value="Center"/>
+     <Setter Property="Margin" Value="0,0,7,0"/>
+     <Setter Property="IsHitTestVisible" Value="False"/>
+   </Style>
+   <Style x:Key="Report.DetailText" TargetType="TextBlock">
+     <Setter Property="Foreground" Value="#213F6A"/>
+     <Setter Property="TextAlignment" Value="Center"/>
+     <Setter Property="TextWrapping" Value="Wrap"/>
+     <Setter Property="VerticalAlignment" Value="Center"/>
+   </Style>
+   <DataTemplate x:Key="Report.AssignmentStatementCell">
+     <Grid HorizontalAlignment="Center" Margin="8,3">
+       <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+       <icons:PackIconMaterial Kind="ClipboardTextOutline" Style="{StaticResource Report.DetailIcon}"/>
+       <TextBlock Grid.Column="1" Text="{Binding Value}" Style="{StaticResource Report.DetailText}"/>
+     </Grid>
+   </DataTemplate>
+   <!-- تُثبّت أيقونة كل حقل إلى يمين عنوانه، ويظل التفاف العنوان والقيمة ضمن عرض العمود. -->
+   <Style x:Key="Report.AssignmentFieldLayout" TargetType="DockPanel">
+     <Setter Property="Margin" Value="0,2,12,4"/>
+   </Style>
+   <Style x:Key="Report.AssignmentField" TargetType="TextBlock">
+     <Setter Property="Foreground" Value="#213F6A"/>
+     <Setter Property="TextWrapping" Value="Wrap"/>
+     <Setter Property="VerticalAlignment" Value="Center"/>
+   </Style>
+   <!-- يعرض الرأس رقم المجموعة فورًا ثم يملأ الحقول المرتبطة عند وصول تفاصيلها. -->
+   <DataTemplate x:Key="Report.AssignmentHeader">
+     <Border Background="#EEF3FA" BorderBrush="#C8D7EB" BorderThickness="1" CornerRadius="8"
+             Padding="12,7" Margin="4,4,6,4">
+       <Grid FlowDirection="RightToLeft">
+         <Grid.ColumnDefinitions>
+           <ColumnDefinition/>
+           <ColumnDefinition/>
+           <ColumnDefinition/>
+           <ColumnDefinition/>
+           <ColumnDefinition/>
+         </Grid.ColumnDefinitions>
+         <Grid.RowDefinitions>
+           <RowDefinition Height="Auto"/>
+           <RowDefinition Height="Auto"/>
+         </Grid.RowDefinitions>
+         <DockPanel Style="{StaticResource Report.AssignmentFieldLayout}">
+           <icons:PackIconMaterial DockPanel.Dock="Left" Kind="Identifier" Style="{StaticResource Report.DetailIcon}"/>
+           <TextBlock Style="{StaticResource Report.AssignmentField}" FontSize="16" FontWeight="Bold">
+             <Run Text="رقم التكليف: "/>
+             <Run Text="{Binding Number, Mode=OneWay, FallbackValue='…'}"/>
+           </TextBlock>
+         </DockPanel>
+         <DockPanel Grid.Column="1" Style="{StaticResource Report.AssignmentFieldLayout}">
+           <icons:PackIconMaterial DockPanel.Dock="Left" Kind="CalendarMonthOutline" Style="{StaticResource Report.DetailIcon}"/>
+           <TextBlock Style="{StaticResource Report.AssignmentField}">
+             <Run Text="التاريخ: " FontWeight="SemiBold"/>
+             <Run Text="{Binding Date, Mode=OneWay, StringFormat='dd/MM/yyyy'}" FlowDirection="LeftToRight"/>
+           </TextBlock>
+         </DockPanel>
+         <DockPanel Grid.Column="2" Style="{StaticResource Report.AssignmentFieldLayout}">
+           <icons:PackIconMaterial DockPanel.Dock="Left" Kind="OfficeBuildingOutline" Style="{StaticResource Report.DetailIcon}"/>
+           <TextBlock Style="{StaticResource Report.AssignmentField}">
+             <Run Text="المبنى: " FontWeight="SemiBold"/>
+             <Run Text="{Binding Building, Mode=OneWay, TargetNullValue='—'}" FlowDirection="LeftToRight"/>
+           </TextBlock>
+         </DockPanel>
+         <DockPanel Grid.Column="3" Style="{StaticResource Report.AssignmentFieldLayout}">
+           <icons:PackIconMaterial DockPanel.Dock="Left" Kind="AccountCheckOutline" Style="{StaticResource Report.DetailIcon}"/>
+           <TextBlock Style="{StaticResource Report.AssignmentField}">
+             <Run Text="الفاحص: " FontWeight="SemiBold"/>
+             <Run Text="{Binding Inspector, Mode=OneWay, TargetNullValue='—'}"/>
+           </TextBlock>
+         </DockPanel>
+         <DockPanel Grid.Column="4" Style="{StaticResource Report.AssignmentFieldLayout}">
+           <icons:PackIconMaterial DockPanel.Dock="Left" Kind="WrenchOutline" Style="{StaticResource Report.DetailIcon}"/>
+           <TextBlock Style="{StaticResource Report.AssignmentField}">
+             <Run Text="نوع الصيانة: " FontWeight="SemiBold"/>
+             <Run Text="{Binding Type, Mode=OneWay}"/>
+           </TextBlock>
+         </DockPanel>
+         <DockPanel Grid.Row="1" Style="{StaticResource Report.AssignmentFieldLayout}">
+           <icons:PackIconMaterial DockPanel.Dock="Left" Kind="Tools" Style="{StaticResource Report.DetailIcon}"/>
+           <TextBlock Style="{StaticResource Report.AssignmentField}">
+             <Run Text="نوع الخدمات: " FontWeight="SemiBold"/>
+             <Run Text="{Binding Service, Mode=OneWay, TargetNullValue='—'}"/>
+           </TextBlock>
+         </DockPanel>
+         <DockPanel Grid.Row="1" Grid.Column="1" Style="{StaticResource Report.AssignmentFieldLayout}">
+           <icons:PackIconMaterial DockPanel.Dock="Left" Kind="ListStatus" Style="{StaticResource Report.DetailIcon}"/>
+           <TextBlock Style="{StaticResource Report.AssignmentField}" FontWeight="SemiBold">
+             <Run Text="حالة الصيانة: "/>
+             <Run Text="{Binding Status, Mode=OneWay}"/>
+           </TextBlock>
+         </DockPanel>
+         <DockPanel Grid.Row="1" Grid.Column="2" Style="{StaticResource Report.AssignmentFieldLayout}">
+           <icons:PackIconMaterial DockPanel.Dock="Left" Kind="CashMultiple" Style="{StaticResource Report.DetailIcon}"/>
+           <TextBlock Style="{StaticResource Report.AssignmentField}" FontWeight="SemiBold">
+             <Run Text="تكاليف الصيانة: "/>
+             <Run Text="{Binding Cost, Mode=OneWay, StringFormat='{}{0:N3} د.ل'}"/>
+           </TextBlock>
+         </DockPanel>
+         <DockPanel Grid.Row="1" Grid.Column="3" Style="{StaticResource Report.AssignmentFieldLayout}">
+           <icons:PackIconMaterial DockPanel.Dock="Left" Kind="AccountGroupOutline" Style="{StaticResource Report.DetailIcon}"/>
+           <TextBlock Style="{StaticResource Report.AssignmentField}">
+             <Run Text="الموظفون: " FontWeight="SemiBold"/>
+             <Run Text="{Binding Technicians, Mode=OneWay}"/>
+           </TextBlock>
+         </DockPanel>
+         <!-- يظهر اسم الفرع في البطاقة فقط عند عرض نتائج قاعدة التجميع. -->
+         <DockPanel Grid.Row="1" Grid.Column="4">
+           <DockPanel.Style>
+             <Style TargetType="DockPanel" BasedOn="{StaticResource Report.AssignmentFieldLayout}">
+               <Style.Triggers>
+                 <DataTrigger Binding="{Binding BranchName}" Value="{x:Null}">
+                   <Setter Property="Visibility" Value="Collapsed"/>
+                 </DataTrigger>
+               </Style.Triggers>
+             </Style>
+           </DockPanel.Style>
+           <icons:PackIconMaterial DockPanel.Dock="Left" Kind="OfficeBuildingOutline" Style="{StaticResource Report.DetailIcon}"/>
+           <TextBlock Style="{StaticResource Report.AssignmentField}">
+             <Run Text="الفرع: " FontWeight="SemiBold"/>
+             <Run Text="{Binding BranchName, Mode=OneWay}"/>
+           </TextBlock>
+         </DockPanel>
+       </Grid>
+     </Border>
+   </DataTemplate>
+ </ResourceDictionary></mah:MetroWindow.Resources>
+ <mah:MetroWindow.Flyouts>
+   <mah:FlyoutsControl>
+     <!-- نفس قوالب الكشف مع معاينة داخل النافذة وتصدير المستند المطبوع. -->
+     <mah:Flyout x:Name="MaintenancePrintFlyout" Style="{StaticResource Maintenance.Flyout}" Header="معاينة كشف الصيانة"
+                 Tag="PrinterOutline" IsOpenChanged="PreviewFlyout_IsOpenChanged">
+       <Border Style="{StaticResource Maintenance.Flyout.Card}" MaxWidth="1500">
+         <DockPanel>
+           <orders:MaintenanceFlyoutHeader DockPanel.Dock="Top"/>
+           <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="16,8">
+             <dxe:ComboBoxEdit x:Name="PreviewExportFormat" Style="{StaticResource Report.Editor}" Width="140"
+                               IsTextEditable="False" SelectedIndex="0" ItemTemplate="{StaticResource StaticChoice.Template}"
+                               AutomationProperties.Name="صيغة التصدير">
+               <dxe:ComboBoxEdit.ItemsSource>
+                 <x:Array Type="{x:Type sys:String}"><sys:String>PDF</sys:String><sys:String>Excel</sys:String><sys:String>Word</sys:String></x:Array>
+               </dxe:ComboBoxEdit.ItemsSource>
+             </dxe:ComboBoxEdit>
+             <dx:SimpleButton Click="ExportPreview_Click" Style="{StaticResource Report.ClearButton}">
+               <StackPanel Orientation="Horizontal">
+                 <icons:PackIconMaterial Kind="Export" Width="18" Height="18" Margin="0,0,8,0"/>
+                 <TextBlock Text="تصدير التقرير"/>
+               </StackPanel>
+             </dx:SimpleButton>
+           </StackPanel>
+           <!-- يعرض مستند قالب DevExpress ويفتح أوامر الطباعة من داخل المعاينة. -->
+           <dxp:DocumentPreviewControl x:Name="PreviewViewer" Margin="12,0,12,12"/>
+         </DockPanel>
+       </Border>
+     </mah:Flyout>
+     <!-- بطاقة للقراءة تعرض تفاصيل التكليف وآخر تقرير إنهاء من الفرع نفسه. -->
+     <mah:Flyout x:Name="BranchDetailsFlyout" Style="{StaticResource Maintenance.Flyout}" Tag="ClipboardTextClock">
+       <Border Style="{StaticResource Maintenance.Flyout.Card}" MaxWidth="1000" MaxHeight="560" VerticalAlignment="Center">
+         <DockPanel>
+           <orders:MaintenanceFlyoutHeader DockPanel.Dock="Top"/>
+           <ScrollViewer VerticalScrollBarVisibility="Auto">
+             <StackPanel Margin="24" TextBlock.Foreground="#213F6A" TextBlock.FontSize="15">
+               <UniformGrid Columns="3" Margin="0,0,0,16">
+                 <StackPanel><TextBlock Text="تاريخ التكليف" FontWeight="SemiBold"/><TextBlock Text="{Binding Date}"/></StackPanel>
+                 <StackPanel><TextBlock Text="المبنى" FontWeight="SemiBold"/><TextBlock Text="{Binding Building}" TextWrapping="Wrap"/></StackPanel>
+                 <StackPanel><TextBlock Text="حالة الصيانة" FontWeight="SemiBold"/><TextBlock Text="{Binding Status}"/></StackPanel>
+               </UniformGrid>
+               <UniformGrid Columns="3" Margin="0,0,0,16">
+                 <StackPanel><TextBlock Text="نوع الخدمات" FontWeight="SemiBold"/><TextBlock Text="{Binding Service}" TextWrapping="Wrap"/></StackPanel>
+                 <StackPanel><TextBlock Text="نوع الصيانة" FontWeight="SemiBold"/><TextBlock Text="{Binding MaintenanceType}"/></StackPanel>
+                 <StackPanel><TextBlock Text="الفنيون" FontWeight="SemiBold"/><TextBlock Text="{Binding Technicians}" TextWrapping="Wrap"/></StackPanel>
+               </UniformGrid>
+               <TextBlock Text="الإدارة والقسم" FontWeight="SemiBold"/>
+               <TextBlock Text="{Binding Scope}" TextWrapping="Wrap" Margin="0,2,0,10"/>
+               <TextBlock Text="تفاصيل التكليف" FontWeight="SemiBold"/>
+               <TextBlock Text="{Binding Details}" TextWrapping="Wrap" Margin="0,2,0,10"/>
+               <TextBlock Text="آخر تقرير إنهاء" FontWeight="Bold" Margin="0,8,0,6"/>
+               <TextBlock Text="{Binding Completion.Date, TargetNullValue='لا يوجد تقرير إنهاء مسجل.', FallbackValue='لا يوجد تقرير إنهاء مسجل.'}"/>
+               <TextBlock Text="{Binding Completion.Observer}" TextWrapping="Wrap" Margin="0,2"/>
+               <TextBlock Text="{Binding Completion.Notes}" TextWrapping="Wrap" Margin="0,2"/>
+             </StackPanel>
+           </ScrollViewer>
+         </DockPanel>
+       </Border>
+     </mah:Flyout>
+   </mah:FlyoutsControl>
+ </mah:MetroWindow.Flyouts>
+ <Border Margin="12" Background="#F6F8FC" BorderBrush="#C9D5E8" BorderThickness="1" CornerRadius="18"><Grid>
+  <Grid.RowDefinitions><RowDefinition Height="94"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+  <Border Background="#213F6A" CornerRadius="17,17,0,0" Padding="30,0"><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+   <StackPanel Orientation="Horizontal" VerticalAlignment="Center"><Border Width="52" Height="52" Background="#365A90" CornerRadius="14" Margin="0,0,16,0"><icons:PackIconMaterial Kind="ChartBoxOutline" Width="31" Height="31" Foreground="#F2C979" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border><StackPanel VerticalAlignment="Center"><TextBlock x:Name="ReportHeading" Text="تقارير الصيانة" FontSize="26" FontWeight="SemiBold" Foreground="White"/><TextBlock x:Name="ReportDescription" Text="بحث وفلترة وطباعة تكاليف الصيانة وتقارير الإنهاء" FontSize="13" Foreground="#E0E9F7" Margin="0,4,0,0"/></StackPanel></StackPanel>
+   <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+     <dx:SimpleButton Click="Minimize_Click" Width="42" Height="42" Margin="0,0,6,0" Background="White" Foreground="#213F6A" ToolTip="تصغير" AutomationProperties.Name="تصغير">
+       <icons:PackIconMaterial Kind="Minus" Width="20" Height="20"/>
+     </dx:SimpleButton>
+     <dx:SimpleButton Click="Resize_Click" Width="42" Height="42" Margin="0,0,6,0" Background="White" Foreground="#213F6A" ToolTip="تغيير حجم النافذة" AutomationProperties.Name="تغيير حجم النافذة">
+       <icons:PackIconMaterial Kind="Resize" Width="20" Height="20"/>
+     </dx:SimpleButton>
+     <dx:SimpleButton Click="Close_Click" Width="42" Height="42" Background="White" Foreground="#213F6A" ToolTip="إغلاق" AutomationProperties.Name="إغلاق">
+       <icons:PackIconMaterial Kind="Close" Width="20" Height="20"/>
+     </dx:SimpleButton>
+   </StackPanel>
+  </Grid></Border>
+  <Grid Grid.Row="1" Margin="28,22"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+   <!-- نفس آلية Report_Maint: مربع تفعيل بجانب كل معيار ولا يطبق الشرط قبل تفعيله. -->
+   <Border Background="White" BorderBrush="#C8D7EB" BorderThickness="1" CornerRadius="15" Padding="18" Margin="0,0,0,14"><Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+    <!-- اختيار الفرع يظهر في وضع التقارير المجمّعة فقط. -->
+    <StackPanel x:Name="BranchFilterRow" Grid.ColumnSpan="3" Orientation="Horizontal" Margin="0,0,0,12" Visibility="Collapsed">
+      <icons:PackIconMaterial Kind="OfficeBuildingOutline" Width="20" Height="20" VerticalAlignment="Center" Foreground="#213F6A" Margin="0,0,8,0"/>
+      <CheckBox x:Name="BranchFilterEnabled" Content="حسب الفرع" Style="{StaticResource Report.Toggle}" IsEnabled="False"
+                Checked="BranchFilterEnabled_Changed" Unchecked="BranchFilterEnabled_Changed"/>
+      <dxe:ComboBoxEdit x:Name="BranchFilter" Style="{StaticResource Report.Editor}" Width="260" NullText="اختر الفرع"
+                        DisplayMember="Name" ValueMember="Id" IsTextEditable="False"
+                        IsEnabled="{Binding IsChecked, ElementName=BranchFilterEnabled}"
+                        EditValueChanged="BranchFilter_EditValueChanged" AutomationProperties.Name="الفرع"/>
+    </StackPanel>
+    <Grid Grid.Row="1" Margin="0,0,14,12">
+      <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+      <CheckBox x:Name="DateFilter" Content="من تاريخ" Style="{StaticResource Report.Toggle}" Checked="ToggleFilter_Changed" Unchecked="ToggleFilter_Changed"/>
+      <dxe:DateEdit x:Name="FromDate" Grid.Column="1" Style="{StaticResource Report.Editor}"
+                    ShowError="False" ShowErrorToolTip="False" Validation.ErrorTemplate="{StaticResource errorTemplateSilverlightStyle3}"
+                    MaxWidth="150" Mask="dd/MM/yyyy" MaskUseAsDisplayFormat="True" IsEnabled="{Binding IsChecked,ElementName=DateFilter}" EditValueChanged="Filter_EditValueChanged"/>
+      <TextBlock Grid.Column="2" Text="إلى تاريخ" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="#213F6A" Margin="8,0,5,0"/>
+      <!-- يعرض قالب الخطأ نتيجة التحقق المرتبطة بحقل نهاية الفترة. -->
+      <dxe:DateEdit x:Name="ToDate" Grid.Column="3" Style="{StaticResource Report.Editor}" MaxWidth="150"
+                    ShowError="False" ShowErrorToolTip="False" Validation.ErrorTemplate="{StaticResource errorTemplateSilverlightStyle3}"
+                    Mask="dd/MM/yyyy" MaskUseAsDisplayFormat="True" IsEnabled="{Binding IsChecked,ElementName=DateFilter}"
+                    EditValueChanged="Filter_EditValueChanged"/>
+    </Grid>
+    <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="0,0,14,12">
+        <CheckBox x:Name="BuildingFilterEnabled" Content="حسب المبنى" Style="{StaticResource Report.Toggle}" Checked="ToggleFilter_Changed" Unchecked="ToggleFilter_Changed"/>
+                            <dxe:ComboBoxEdit ShowError="False" ShowErrorToolTip="False" Validation.ErrorTemplate="{StaticResource errorTemplateSilverlightStyle3}" x:Name="BuildingFilter" ItemsSource="{Binding T_Build}"
+                          Style="{StaticResource Report.Editor}" NullText="اختر المبنى" 
+                                              DisplayMember="Build" 
+    ValueMember="Build_ID"
+                          IsEnabled="{Binding IsChecked,ElementName=BuildingFilterEnabled}"
+                                              
+                          EditValueChanged="Filter_EditValueChanged" Width="284"/>
+    </StackPanel>
+    <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Horizontal" Margin="0,0,0,12">
+        <CheckBox x:Name="ServiceFilterEnabled" Content="بنوع الخدمات" Style="{StaticResource Report.Toggle}" Checked="ToggleFilter_Changed" Unchecked="ToggleFilter_Changed"/>
+                            <dxe:ComboBoxEdit  DisplayMember="Serv_type" 
+    ValueMember="Serv_num" x:Name="ServiceFilter" ItemsSource="{Binding T_Services}"
+                                                                   ShowError="False" ShowErrorToolTip="False" Validation.ErrorTemplate="{StaticResource errorTemplateSilverlightStyle3}"
+
+                                               Style="{StaticResource Report.Editor}" 
+                                               NullText="اختر نوع الخدمات" IsEnabled="{Binding IsChecked,ElementName=ServiceFilterEnabled}"
+                                               EditValueChanged="Filter_EditValueChanged" Width="294"/>
+    </StackPanel>
+    <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,0,14,12">
+        <CheckBox x:Name="MaintenanceTypeFilterEnabled" Content="بنوع الصيانة" Style="{StaticResource Report.Toggle}" Checked="ToggleFilter_Changed" Unchecked="ToggleFilter_Changed"/>
+        <dxe:ComboBoxEdit x:Name="MaintenanceTypeFilter" 
+                                              ShowError="False" ShowErrorToolTip="False" Validation.ErrorTemplate="{StaticResource errorTemplateSilverlightStyle3}"
+
+                          Style="{StaticResource Report.Editor}" NullText="اختر النوع" IsTextEditable="False" ItemTemplate="{StaticResource StaticChoice.Template}" IsEnabled="{Binding IsChecked,ElementName=MaintenanceTypeFilterEnabled}" EditValueChanged="Filter_EditValueChanged" Width="286">
+                                <dxe:ComboBoxEditItem Content="دورية"/>
+                                <dxe:ComboBoxEditItem Content="وقائية"/>
+                                <dxe:ComboBoxEditItem Content="طارئة"/>
+
+                            </dxe:ComboBoxEdit>
+    </StackPanel>
+    <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Margin="0,0,14,12">
+        <CheckBox x:Name="TechnicianFilterEnabled" Content="حسب الفني" Style="{StaticResource Report.Toggle}" Checked="ToggleFilter_Changed" Unchecked="ToggleFilter_Changed"/>
+                            <dxe:ComboBoxEdit ShowError="False" ShowErrorToolTip="False" Validation.ErrorTemplate="{StaticResource errorTemplateSilverlightStyle3}" x:Name="TechnicianFilter" ItemsSource="{Binding T_Employe}" DisplayMember="Emp_Name" 
+    ValueMember="Employe_ID"
+                                              Style="{StaticResource Report.Editor}" NullText="اختر الفني" IsEnabled="{Binding IsChecked,ElementName=TechnicianFilterEnabled}" EditValueChanged="Filter_EditValueChanged" Width="288"/>
+    </StackPanel>
+    <StackPanel Grid.Row="2" Grid.Column="2" Orientation="Horizontal" Margin="0,0,0,12"
+                >
+        <CheckBox x:Name="StatusFilterEnabled" Content="حسب حالة الإنهاء" Style="{StaticResource Report.Toggle}" Checked="ToggleFilter_Changed" Unchecked="ToggleFilter_Changed"/>
+                            <dxe:ComboBoxEdit ShowError="False" ShowErrorToolTip="False" Validation.ErrorTemplate="{StaticResource errorTemplateSilverlightStyle3}" x:Name="StatusFilter" Style="{StaticResource Report.Editor}" IsTextEditable="False" ItemTemplate="{StaticResource StaticChoice.Template}" NullText="اختر الحالة" IsEnabled="{Binding IsChecked,ElementName=StatusFilterEnabled}" EditValueChanged="Filter_EditValueChanged" Width="278">
+                                <dxe:ComboBoxEditItem Content="منجزة"/>
+                                <dxe:ComboBoxEditItem Content="غير منجزة"/>
+                                <dxe:ComboBoxEditItem Content="معلقة"/>
+                                <dxe:ComboBoxEditItem Content="قيد الإنجاز"/>
+                                <dxe:ComboBoxEditItem Content="لم يتم الإجراء"/>
+                            </dxe:ComboBoxEdit>
+    </StackPanel>
+    <Border Grid.Row="3" Grid.ColumnSpan="3" Background="#F2F6FB" BorderBrush="#D5E0EE" BorderThickness="1" CornerRadius="10" Padding="7">
+        <StackPanel Orientation="Horizontal" FlowDirection="RightToLeft" HorizontalAlignment="Center">
+            <dx:SimpleButton x:Name="ShowReportButton" Click="Search_Click" Style="{StaticResource Report.ShowButton}">
+                <StackPanel Orientation="Horizontal"><icons:PackIconMaterial Kind="Magnify" Width="20" Height="20" Margin="0,0,8,0"/>
+                    <TextBlock Text="عرض"/>
+                </StackPanel>
+            </dx:SimpleButton>
+            <TextBlock Text="شكل الطباعة" Foreground="#213F6A" FontWeight="SemiBold" VerticalAlignment="Center" Margin="13,0,8,0"/>
+                                <dxe:ComboBoxEdit x:Name="PrintMode" ShowError="False" ShowErrorToolTip="False" Validation.ErrorTemplate="{StaticResource errorTemplateSilverlightStyle3}" EditValueChanged="Filter_EditValueChanged" Style="{StaticResource Report.Editor}" Width="250" IsTextEditable="False" NullText="اختر شكل الطباعة" ItemTemplate="{StaticResource StaticChoice.Template}">
+                                    <dxe:ComboBoxEditItem Content="طباعة الكشف الحالي"/>
+                                    <dxe:ComboBoxEditItem Content="طباعة كشف مقسم حسب التاريخ"/>
+                                    <dxe:ComboBoxEditItem Content="طباعة كشف مقسم حسب المبني"/>
+                                    <dxe:ComboBoxEditItem Content="طباعة كشف مقسم حسب الفني"/>
+                                    <dxe:ComboBoxEditItem Content="طباعة كشف مقسم حسب نوع الخدمات"/>
+                                    <dxe:ComboBoxEditItem Content="طباعة رؤوس التكليفات كجدول واحد"/>
+                                    <!-- يتبع ظهور خياري الفرع وضع نافذة تقارير الفروع. -->
+                                    <dxe:ComboBoxEditItem x:Name="BranchPrintChoice" Content="طباعة كشف مقسم حسب الفرع" Visibility="Collapsed"/>
+                                    <dxe:ComboBoxEditItem x:Name="BranchHeadersPrintChoice" Content="طباعة رؤوس التكليفات مقسمة حسب الفرع" Visibility="Collapsed"/>
+                                </dxe:ComboBoxEdit>
+            <!-- يُعطّل الزر مؤقتًا حتى تكتمل قراءة البيانات وتهيئة معاينة الكشف. -->
+            <dx:SimpleButton x:Name="PrintReportButton" Click="Print_Click" Style="{StaticResource Report.PrintButton}">
+                <StackPanel Orientation="Horizontal">
+                    <icons:PackIconMaterial Kind="PrinterOutline" Width="20" Height="20" Margin="0,0,8,0"/>
+                    <TextBlock Text="طباعة"/>
+                </StackPanel>
+            </dx:SimpleButton>
+            <dx:SimpleButton Click="Clear_Click" Style="{StaticResource Report.ClearButton}">
+                <StackPanel Orientation="Horizontal"><icons:PackIconMaterial Kind="Broom" Width="20" Height="20" Margin="0,0,8,0"/>
+                    <TextBlock Text="مسح الفلاتر"/>
+                </StackPanel>
+            </dx:SimpleButton>
+        </StackPanel></Border>
+   </Grid></Border>
+   <Border Grid.Row="1" Background="White" BorderBrush="#C8D7EB" BorderThickness="1" CornerRadius="12" Padding="8">
+                    <dxg:GridControl x:Name="ReportsGrid" dx:ThemeManager.ThemeName="Win11Light" RestoreStateOnSourceChange="True" 
+                                     RestoreStateKeyFieldName="Emergency_MaintenanceCosts_No" ItemsSource="{Binding ItemsSource}"
+                                     AutoGenerateColumns="None" CustomGroupDisplayText="ReportsGrid_CustomGroupDisplayText"
+                                     FontSize="14" BorderThickness="0">
+           <dxg:GridControl.View>
+                            <dxg:TableView x:Name="ReportsTableView" AutoWidth="True" 
+                                           DataSourceRefreshCommand="{Binding DataSourceRefreshCommand}"
+                                           ShowGroupPanel="False" NavigationStyle="Row" AllowEditing="False"
+                                           RowMinHeight="42" ShowIndicator="False"/>
+           </dxg:GridControl.View>
+           <dxg:GridControl.Columns>
+    <!-- التجميع بمفتاح الفرع يمنع دمج فرعين يحملان الاسم نفسه. -->
+    <dxg:GridColumn x:Name="BranchGroupColumn" FieldName="BranchId" Header="الفرع" Visible="False" ShowInColumnChooser="False"/>
+    <dxg:GridColumn x:Name="ReportNumberColumn" FieldName="Emergency_MaintenanceCosts_No" Header="رقم التكليف" HorizontalHeaderContentAlignment="Center" CellTemplate="{StaticResource Report.CenteredCell}" Width=".8*"/>
+    <dxg:GridColumn x:Name="ReportDateColumn" FieldName="T_Emergency_MaintenanceCost.Date_com" Header="التاريخ" HorizontalHeaderContentAlignment="Center" CellTemplate="{StaticResource Report.CenteredCell}" Width=".8*"/>
+    <dxg:GridColumn x:Name="ReportBuildingColumn" FieldName="T_Emergency_MaintenanceCost.T_Build.Build" Header="المبنى" HorizontalHeaderContentAlignment="Center" CellTemplate="{StaticResource Report.CenteredCell}" Width="1.1*"/>
+    <dxg:GridColumn x:Name="ReportServiceColumn" FieldName="T_Emergency_MaintenanceCost.T_Service.Serv_type" Header="نوع الخدمات" HorizontalHeaderContentAlignment="Center" CellTemplate="{StaticResource Report.CenteredCell}" Width="1*"/>
+    <dxg:GridColumn x:Name="ReportTypeColumn" FieldName="T_Emergency_MaintenanceCost.MaintenanceTypeName" Header="نوع الصيانة" HorizontalHeaderContentAlignment="Center" CellTemplate="{StaticResource Report.CenteredCell}" Width=".9*"/>
+    <dxg:GridColumn x:Name="ReportStateColumn" FieldName="T_Emergency_MaintenanceCost.MaintenanceStatusName" Header="حالة الصيانة" HorizontalHeaderContentAlignment="Center" CellTemplate="{StaticResource Report.CenteredCell}" Width="1*"/>
+    <dxg:GridColumn x:Name="ReportPlaceColumn" FieldName="place" Header="الموقع" HorizontalHeaderContentAlignment="Center" CellTemplate="{StaticResource Report.CenteredCell}" Width="1*"/>
+    <dxg:GridColumn x:Name="ReportStatementColumn" FieldName="Statement" Header="التفاصيل" HorizontalHeaderContentAlignment="Center" CellTemplate="{StaticResource Report.CenteredCell}" Width="1.8*"/>
+
+    <!-- الأعمدة المشتركة لتجميع التكليف وعرض بنوده في التقرير المحلي وتقارير الفروع. -->
+    <dxg:GridColumn x:Name="AssignmentGroupColumn" FieldName="AssignmentKey" Visible="False" ShowInColumnChooser="False"
+                    AllowGrouping="True"/>
+    <dxg:GridColumn x:Name="BranchDetailOrderColumn" FieldName="DetailId" Visible="False" ShowInColumnChooser="False" AllowGrouping="False"/>
+    <dxg:GridColumn x:Name="AssignmentActionColumn" FieldName="ActionCode" Header="نوع الإجراء"
+                    Visible="False" AllowGrouping="False" Width="*" HorizontalHeaderContentAlignment="Center">
+      <dxg:GridColumn.CellTemplate>
+        <DataTemplate>
+          <Grid HorizontalAlignment="Center" Margin="8,3">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+            <icons:PackIconMaterial Kind="{Binding RowData.Row.ActionName, Converter={StaticResource StaticChoice.Icon}}">
+              <icons:PackIconMaterial.Style>
+                <Style TargetType="icons:PackIconMaterial" BasedOn="{StaticResource Report.DetailIcon}">
+                  <Style.Triggers>
+                    <DataTrigger Binding="{Binding RowData.Row.ActionName}" Value=""><Setter Property="Visibility" Value="Collapsed"/></DataTrigger>
+                  </Style.Triggers>
+                </Style>
+              </icons:PackIconMaterial.Style>
+            </icons:PackIconMaterial>
+            <TextBlock Grid.Column="1" Text="{Binding RowData.Row.ActionName}" Style="{StaticResource Report.DetailText}"/>
+          </Grid>
+        </DataTemplate>
+      </dxg:GridColumn.CellTemplate>
+    </dxg:GridColumn>
+    <dxg:GridColumn x:Name="AssignmentScopeColumn" FieldName="Management" Header="الموقع"
+                    Visible="False" AllowGrouping="False" Width="1.4*" HorizontalHeaderContentAlignment="Center">
+      <dxg:GridColumn.CellTemplate>
+        <DataTemplate>
+          <Grid HorizontalAlignment="Center" Margin="8,3">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+            <icons:PackIconMaterial Kind="MapMarkerOutline">
+              <icons:PackIconMaterial.Style>
+                <Style TargetType="icons:PackIconMaterial" BasedOn="{StaticResource Report.DetailIcon}">
+                  <Style.Triggers>
+                    <DataTrigger Binding="{Binding RowData.Row.Scope}" Value=""><Setter Property="Visibility" Value="Collapsed"/></DataTrigger>
+                  </Style.Triggers>
+                </Style>
+              </icons:PackIconMaterial.Style>
+            </icons:PackIconMaterial>
+            <TextBlock Grid.Column="1" Text="{Binding RowData.Row.Scope}" Style="{StaticResource Report.DetailText}"/>
+          </Grid>
+        </DataTemplate>
+      </dxg:GridColumn.CellTemplate>
+    </dxg:GridColumn>
+   </dxg:GridControl.Columns>
+                        <dxmvvm:Interaction.Behaviors>
+                            <dxg:DialogEditFormBehavior x:Name="EditFormBehavior" KeyProperty="Emergency_MaintenanceCosts_No" CreateEditItemViewModelCommand="{Binding CreateEditEntityViewModelCommand}" ValidateRowCommand="{Binding ValidateRowCommand}" ValidateRowDeletionCommand="{Binding ValidateRowDeletionCommand}">
+                            </dxg:DialogEditFormBehavior>
+                        </dxmvvm:Interaction.Behaviors>
+                        <dxg:GridControl.InputBindings>
+                            <KeyBinding Key="Delete" Command="{Binding DeleteCommand, ElementName=EditFormBehavior}" />
+                            <KeyBinding Key="F2" Command="{Binding UpdateCommand, ElementName=EditFormBehavior}" />
+                            <KeyBinding Key="N" Command="{Binding CreateCommand, ElementName=EditFormBehavior}" Modifiers="Control" />
+                        </dxg:GridControl.InputBindings>
+                    </dxg:GridControl>
+   
+   </Border>
+   <Border Grid.Row="2" Background="#EEF3FA" BorderBrush="#C8D7EB" BorderThickness="1" CornerRadius="10"
+           Padding="14,8" Margin="0,12,0,0">
+     <Grid>
+       <Grid.ColumnDefinitions>
+         <ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/>
+         <ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/>
+       </Grid.ColumnDefinitions>
+       <StackPanel VerticalAlignment="Center">
+         <TextBlock x:Name="ReportsStatus" TextWrapping="Wrap" Foreground="#526C90"/>
+         <TextBlock Text="{Binding TotalsStatus}" Visibility="{Binding Visibility, ElementName=ReportTotalCostPanel}"
+                    TextWrapping="Wrap" Foreground="#526C90"/>
+       </StackPanel>
+       <StackPanel x:Name="ReportTotalCostPanel" Grid.Column="1" Margin="16,0,0,0" Visibility="Collapsed">
+         <TextBlock Text="إجمالي كل التكاليف" FontSize="12" HorizontalAlignment="Center"/>
+         <TextBlock x:Name="TotalCostAmount" Text="{Binding Totals.Cost, StringFormat='{}{0:N3} د.ل', FallbackValue='—'}" Foreground="#213F6A"
+                    FontSize="18" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+       </StackPanel>
+       <StackPanel Grid.Column="2" Margin="16,0,0,0">
+         <TextBlock Text="العدد الكلي" FontSize="12"/>
+         <TextBlock x:Name="TotalCount" Text="{Binding Totals.Count, StringFormat=N0, FallbackValue='—'}" Foreground="#D11F2A" FontSize="18" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+       </StackPanel>
+       <StackPanel Grid.Column="3" Margin="16,0,0,0">
+         <TextBlock Text="المنجز" FontSize="12"/>
+         <TextBlock x:Name="CompletedCount" Text="{Binding Totals.Completed, StringFormat=N0, FallbackValue='—'}" Foreground="#23896B" FontSize="18" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+       </StackPanel>
+       <StackPanel Grid.Column="4" Margin="16,0,0,0">
+         <TextBlock Text="غير المنجز" FontSize="12"/>
+         <TextBlock x:Name="NotCompletedCount" Text="{Binding Totals.Incomplete, StringFormat=N0, FallbackValue='—'}" Foreground="#C15D4A" FontSize="18" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+       </StackPanel>
+       <StackPanel Grid.Column="5" Margin="16,0,0,0">
+         <TextBlock Text="المعلّق" FontSize="12"/>
+         <TextBlock x:Name="SuspendedCount" Text="{Binding Totals.Suspended, StringFormat=N0, FallbackValue='—'}" Foreground="#A46C0D" FontSize="18" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+       </StackPanel>
+       <StackPanel Grid.Column="6" Margin="16,0,0,0">
+         <TextBlock Text="قيد الإنجاز" FontSize="12"/>
+         <TextBlock x:Name="InProgressCount" Text="{Binding Totals.InProgress, StringFormat=N0, FallbackValue='—'}" Foreground="#187F96" FontSize="18" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+       </StackPanel>
+     </Grid>
+   </Border>
+  </Grid>
+ </Grid></Border>
+</mah:MetroWindow>

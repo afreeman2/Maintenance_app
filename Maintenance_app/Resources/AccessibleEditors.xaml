@@ -1,0 +1,31 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+ xmlns:vm="clr-namespace:Maintenance_app.viewo_Model">
+   <BooleanToVisibilityConverter x:Key="Accessible.EditorVisibility"/>
+   <!-- ننشئ حاويات الأزرار المحمية نفسها، مع إبقاء محرر DevExpress وثيمه والقائمة والتقويم الأصليين. -->
+   <ControlTemplate x:Key="Accessible.EditorTemplate" TargetType="dxe:ButtonEdit">
+    <ContentControl Template="{TemplateBinding ActualBorderTemplate}" Focusable="False"
+                    HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+     <Grid>
+      <Grid.ColumnDefinitions>
+       <ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/>
+      </Grid.ColumnDefinitions>
+      <vm:AccessibleEditorButtonsControl x:Name="PART_LeftButtons" ItemsSource="{TemplateBinding LeftButtons}"
+       Visibility="{Binding ActualShowLeftButtons, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource Accessible.EditorVisibility}}"/>
+      <dxe:EditorControl x:Name="PART_Content" Grid.Column="1" Focusable="False"
+                         Template="{TemplateBinding ActualEditorControlTemplate}"/>
+      <vm:AccessibleEditorButtonsControl x:Name="PART_RightButtons" Grid.Column="2" ItemsSource="{TemplateBinding RightButtons}"
+       Visibility="{Binding ActualShowRightButtons, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource Accessible.EditorVisibility}}"/>
+     </Grid>
+    </ContentControl>
+    <ControlTemplate.Triggers>
+     <Trigger Property="IsTextEditable" Value="True">
+      <Setter TargetName="PART_Content" Property="Template" Value="{Binding EditTemplate, RelativeSource={RelativeSource TemplatedParent}}"/>
+     </Trigger>
+     <Trigger Property="IsTextEditable" Value="False">
+      <Setter TargetName="PART_Content" Property="Template" Value="{Binding EditNonEditableTemplate, RelativeSource={RelativeSource TemplatedParent}}"/>
+     </Trigger>
+    </ControlTemplate.Triggers>
+   </ControlTemplate>
+</ResourceDictionary>

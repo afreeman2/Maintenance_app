@@ -1,0 +1,145 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <ApplicationIcon>Resources\maintenance-crossed-tools.ico</ApplicationIcon>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Platforms>AnyCPU;x64</Platforms>
+    <AssemblyName>Maintenance_app</AssemblyName>
+    <PackageId>Maintenance_app</PackageId>
+    <Title>منظومة الخدمات والصيانة</Title>
+    <Version>3.0.0</Version>
+    <AssemblyVersion>3.0.0.0</AssemblyVersion>
+    <FileVersion>3.0.0.0</FileVersion>
+    <Authors>ادارة تقنية المعلومات والاتصالات</Authors>
+    <Company>صندوق الضمان الاجتماعي</Company>
+    <Product>منظومة الخدمات والصيانة</Product>
+    <Description>منظومة إدارة الخدمات والصيانة</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- مورد أيقونة التطبيق للنوافذ وأيقونة ملف التشغيل. -->
+    <Resource Include="Resources\maintenance-crossed-tools.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+    <EmbeddedResource Include="Resources\RequestNotification.wav" LogicalName="Maintenance.RequestNotification.wav" />
+    <PackageReference Include="ReportViewerCore.WinForms" Version="15.1.33" />
+    <None Remove="Resources\MaintenanceOriginal-mins4.jpg" />
+    <Resource Include="Resources\MaintenanceOriginal-mins4.jpg" />
+    <None Remove="Resources\CorrespondenceArtwork-v1.png" />
+    <None Remove="Resources\IncomingTransactions-icon-v1.png" />
+    <None Remove="Resources\IncomingTransactions-v1.ico" />
+    <None Remove="Resources\inout4jpg.jpg" />
+    <None Remove="Resources\ssf Logo.jpg" />
+    <None Remove="Resources\SsfLogo-transparent.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DevExpress.Wpf.Core" Version="26.1.6" />
+    <PackageReference Include="DevExpress.Wpf.Grid.Core" Version="26.1.6" />
+    <PackageReference Include="DevExpress.Wpf.Reporting" Version="26.1.6" />
+    <PackageReference Include="DevExpress.Wpf.Themes.Win11Light" Version="26.1.6" />
+    <PackageReference Include="MahApps.Metro" Version="2.4.11" />
+    <PackageReference Include="MahApps.Metro.IconPacks.BootstrapIcons" Version="6.2.1" />
+    <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="6.2.1" />
+    <PackageReference Include="MahApps.Metro.IconPacks.MaterialDesign" Version="6.2.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="bin\x64\Debug\net10.0-windows\Reports\" />
+    <Folder Include="maintenance_Orders\" />
+    <Folder Include="models\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="ConectionString">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </None>
+    <None Update="dataSet\DataSet1.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>DataSet1.Designer.cs</LastGenOutput>
+    </None>
+    <None Update="Reports\*.rdlc" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Update="dataSet\sub_data.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>sub_data.Designer.cs</LastGenOutput>
+    </None>
+    <!-- قالب الإحصائية مطلوب في نسخ التشغيل والمثبّت مثل قوالب RDLC. -->
+    <None Update="Reports\chart_report.repx" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <!-- قالب كشف الصيانة يتلقى نتائج البحث من التطبيق عند المعاينة. -->
+    <None Update="Reports\Maint_grop.repx" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <!-- ملفات مستقلة للتجميع وكشف الرؤوس المختصر، تُنسخ مع التطبيق عند البناء والنشر. -->
+    <None Update="Reports\Maint_grop_date.repx;Reports\Maint_grop_Build.repx;Reports\Maint_grop_Technician.repx;Reports\Maint_grop_HeaderOnly.repx"
+          CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <!-- كشف الفروع التفصيلي وجدول الرؤوس المجمع بالفرع يرافقان نسخ التشغيل والنشر. -->
+    <None Update="Reports\Maint_grop_Branch.repx;Reports\Maint_grop_HeadersByBranch.repx"
+          CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <!-- قوالب التكليف والمواد والإنهاء ترافق نسخ البناء والنشر. -->
+    <None Update="Reports\Mainte_Report.repx;Reports\parts.repx;Reports\Done_Mainte_Report.repx"
+          CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <!-- نافذتا الفحص اليومي تقرآن نسختي REPX عند الطباعة. -->
+    <None Update="Reports\new_Daly_Check.repx;Reports\new_Daly_Check_serv.repx"
+          CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <!-- قالب الفحص اليومي كما هو في مصدر المنظومة القديمة المعتمد. -->
+    <None Include="D:\GitHub\Maintenance_services\Maintenance_services\bin\x64\Release\Reports\new_Daly_Check.rdlc" Link="Reports\new_Daly_Check.rdlc" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <!-- قوالب كشف الصيانة المعتمدة في المنظومة القديمة؛ تربط كما هي للطباعة دون إعادة تصميمها. -->
+    <None Include="D:\GitHub\Maintenance_services\Maintenance_services\bin\Debug\Reports\Maint_grop.rdlc" Link="Reports\Maint_grop.rdlc" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Include="D:\GitHub\Maintenance_services\Maintenance_services\bin\Debug\Reports\Maint_grop_date.rdlc" Link="Reports\Maint_grop_date.rdlc" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Include="D:\GitHub\Maintenance_services\Maintenance_services\bin\Debug\Reports\Maint_grop_Build.rdlc" Link="Reports\Maint_grop_Build.rdlc" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\CorrespondenceArtwork-v1.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\IncomingTransactions-icon-v1.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\IncomingTransactions-v1.ico">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\inout4jpg.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\ssf Logo.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\SsfLogo-transparent.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="dataSet\DataSet1.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>DataSet1.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="dataSet\sub_data.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>sub_data.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>

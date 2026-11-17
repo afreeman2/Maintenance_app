@@ -1,0 +1,420 @@
+<mah:MetroWindow xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+                 xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid" 
+                 xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+                 xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+                 xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+               
+                                  xmlns:orders="clr-namespace:Maintenance_app.orders_Windows"
+                 x:Class="Maintenance_app.Accounts.UsersWindow"
+                  xmlns:vm="clr-namespace:Maintenance_app.viewo_Model" 
+                 xmlns:conv="clr-namespace:Maintenance_app.converts"
+
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:local="clr-namespace:Maintenance_app.converts;assembly=Maintenance_app"
+                 mc:Ignorable="d"  
+                 dx:ThemeManager.ThemeName="None" Title="إدارة المستخدمين والصلاحيات"
+                 Height="780" Width="1250" MinHeight="650" MinWidth="950"
+                 BorderBrush="{x:Null}" WindowStyle="None" AllowsTransparency="True"
+                 ShowTitleBar="False" IsCloseButtonEnabled="False" ShowCloseButton="False"
+                 Background="{x:Null}" Icon="{iconPacks:MaterialDesignImage Kind=Person}"
+                 ResizeMode="NoResize" WindowStartupLocation="CenterScreen"
+                 TitleAlignment="Center" FlowDirection="RightToLeft"
+                 Loaded="MetroWindow_Loaded" FontFamily="Segoe UI"
+                 UseLayoutRounding="True" SnapsToDevicePixels="True">
+    <mah:MetroWindow.DataContext>
+        <vm:Users_view_model />
+    </mah:MetroWindow.DataContext>
+    <mah:MetroWindow.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Resources/MaintenanceWorkspace.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <!--**************************-->
+            <DataTemplate x:Key="CustomHeaderTemplate">
+                <DockPanel x:Name="dpHeader" VerticalAlignment="Bottom" LastChildFill="True" Width="0" Height="0" Margin="-10,0,-22,-6" Visibility="Hidden">
+                    <Button x:Name="PART_BackButton" Command="{Binding InternalCloseCommand, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type mah:Flyout}}}" CommandParameter="{Binding CloseCommandParameter, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type mah:Flyout}}}" Width="50" Height="50" Margin="2 4 2 2" VerticalAlignment="Bottom" Style="{DynamicResource MahApps.Metro.Styles.MetroCircleButtonStyle}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type mah:Flyout}}}" FontFamily="Segoe UI Symbol" FontSize="16" DockPanel.Dock="Left" Background="{DynamicResource AccentColorBrush}" IsCancel="{Binding CloseButtonIsCancel, RelativeSource={RelativeSource AncestorType={x:Type mah:Flyout}, Mode=FindAncestor}}" Visibility="{Binding CloseButtonVisibility, RelativeSource={RelativeSource AncestorType={x:Type mah:Flyout}, Mode=FindAncestor}}" BorderBrush="#FF191616">
+                        <ContentControl Style="{DynamicResource PathIconContentControlStyle}" Content="M19,34V42H43.75L33.75,52H44.25L58.25,38L44.25,24H33.75L43.75,34H19Z" Width="20" Height="20" />
+                    </Button>
+                    <TextBlock x:Name="PART_BackHeaderText" Margin="0 0 15 0" TextAlignment="Right" VerticalAlignment="Center" Text="{Binding}" Visibility="{Binding TitleVisibility, RelativeSource={RelativeSource AncestorType={x:Type mah:Flyout}, Mode=FindAncestor}}" />
+                </DockPanel>
+                <DataTemplate.Triggers>
+                    <DataTrigger Binding="{Binding Position, RelativeSource={RelativeSource AncestorType={x:Type mah:Flyout}}}" Value="Left">
+                        <Setter TargetName="PART_BackHeaderText" Property="Margin" Value="15 0 0 0" />
+                        <Setter TargetName="PART_BackHeaderText" Property="TextAlignment" Value="Left" />
+                        <Setter TargetName="PART_BackButton" Property="DockPanel.Dock" Value="Left" />
+                        <Setter TargetName="PART_BackButton" Property="LayoutTransform">
+                            <Setter.Value>
+                                <ScaleTransform ScaleX="-1" />
+                            </Setter.Value>
+                        </Setter>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Position, RelativeSource={RelativeSource AncestorType={x:Type mah:Flyout}}}" Value="Top">
+                        <Setter TargetName="PART_BackButton" Property="LayoutTransform">
+                            <Setter.Value>
+                                <RotateTransform Angle="-90" />
+                            </Setter.Value>
+                        </Setter>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Position, RelativeSource={RelativeSource AncestorType={x:Type mah:Flyout}}}" Value="Bottom">
+                        <Setter TargetName="PART_BackButton" Property="LayoutTransform">
+                            <Setter.Value>
+                                <RotateTransform Angle="270" />
+                            </Setter.Value>
+                        </Setter>
+                    </DataTrigger>
+                </DataTemplate.Triggers>
+            </DataTemplate>
+            <conv:UserPermissionCountConverter x:Key="UserPermissionCountConverter" />
+            <!-- الألوان الأساسية -->
+            <SolidColorBrush x:Key="MainBlue" Color="#0152A4" />
+            <SolidColorBrush x:Key="MainTeal" Color="#31AAA9" />
+            <SolidColorBrush x:Key="PageBackground" Color="#F3F6FA" />
+            <SolidColorBrush x:Key="TextDark" Color="#243447" />
+            <SolidColorBrush x:Key="TextMuted" Color="#738195" />
+            <Style x:Key="PermissionCheck" TargetType="{x:Type CheckBox}">
+                <Setter Property="HorizontalContentAlignment" Value="Left" />
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="Foreground" Value="#243447" />
+                <Setter Property="Margin" Value="0,5,0,5" />
+                <Setter Property="MinHeight" Value="25" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <EventSetter Event="ToggleButton.Checked" Handler="PermissionCheckBox_Changed" />
+                <EventSetter Event="ToggleButton.Unchecked" Handler="PermissionCheckBox_Changed" />
+            </Style>
+            <Style x:Key="PermissionHeader" TargetType="{x:Type TextBlock}">
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="FontWeight" Value="Bold" />
+                <Setter Property="Foreground" Value="#0152A4" />
+                <Setter Property="Margin" Value="0,5,0,10" />
+                <Setter Property="TextWrapping" Value="NoWrap" />
+            </Style>
+            <!-- شكل الأزرار -->
+            <Style x:Key="ActionButton" TargetType="{x:Type Button}">
+                <Setter Property="Height" Value="38" />
+                <Setter Property="Padding" Value="16,0" />
+                <Setter Property="Margin" Value="4,0" />
+                <Setter Property="FontSize" Value="13" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+                <Setter Property="Cursor" Value="Hand" />
+            </Style>
+            <Style x:Key="NewUserFloatingButton" TargetType="{x:Type Button}">
+                <Setter Property="Width" Value="60" />
+                <Setter Property="Height" Value="60" />
+                <Setter Property="Background" Value="{StaticResource MainBlue}" />
+                <Setter Property="Foreground" Value="White" />
+                <Setter Property="BorderBrush" Value="#8EC5FF" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Cursor" Value="Hand" />
+                <Setter Property="ToolTip" Value="إضافة مستخدم جديد" />
+                <Setter Property="ToolTipService.InitialShowDelay" Value="300" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Border x:Name="ButtonSurface" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="30" RenderTransformOrigin="0.5,0.5">
+                                <Border.Effect>
+                                    <DropShadowEffect Color="#142D4E" BlurRadius="16" ShadowDepth="4" Opacity="0.28" />
+                                </Border.Effect>
+                                <Border.RenderTransform>
+                                    <ScaleTransform />
+                                </Border.RenderTransform>
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="ButtonSurface" Property="Background" Value="#003E7D" />
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="ButtonSurface" Property="Background" Value="#142D4E" />
+                                    <Setter TargetName="ButtonSurface" Property="RenderTransform">
+                                        <Setter.Value>
+                                            <ScaleTransform ScaleX="0.96" ScaleY="0.96" />
+                                        </Setter.Value>
+                                    </Setter>
+                                </Trigger>
+                                <Trigger Property="IsKeyboardFocused" Value="True">
+                                    <Setter TargetName="ButtonSurface" Property="BorderThickness" Value="2" />
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter TargetName="ButtonSurface" Property="Opacity" Value="0.5" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsOpen, ElementName=edit_panel}" Value="True">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+            <Style x:Key="DeleteUserButton" TargetType="{x:Type Button}">
+                <Setter Property="Width" Value="32" />
+                <Setter Property="Height" Value="32" />
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="Background" Value="White" />
+                <Setter Property="Foreground" Value="#B42318" />
+                <Setter Property="FontSize" Value="19" />
+                <Setter Property="FontWeight" Value="Bold" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Cursor" Value="Hand" />
+                <Setter Property="ToolTip" Value="حذف المستخدم" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Border x:Name="ButtonBackground" Background="{TemplateBinding Background}" CornerRadius="16">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="ButtonBackground" Property="Background" Value="#FECDCA" />
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="ButtonBackground" Property="Background" Value="#FDA29B" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
+    </mah:MetroWindow.Resources>
+    <mah:MetroWindow.OpacityMask>
+        <VisualBrush Visual="{Binding ElementName=mybo}" />
+    </mah:MetroWindow.OpacityMask>
+    <Border x:Name="mybo" BorderBrush="{StaticResource Dmc.Border}" BorderThickness="1" HorizontalAlignment="Center" Width="1250" CornerRadius="18" FlowDirection="RightToLeft" Background="White" Height="752" VerticalAlignment="Center" Style="{StaticResource Dmc.WindowCard}">
+        <Grid Margin="18">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <!-- ===================================== -->
+            <!-- رأس الصفحة -->
+            <!-- ===================================== -->
+            <Border Grid.Row="0" Background="{StaticResource Workspace.Header}" CornerRadius="12" Padding="20" Margin="0,0,0,14">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Border Width="50" Height="50" CornerRadius="25" Background="#D2AB61" VerticalAlignment="Center" Margin="4,0,1117,0">
+                        <iconPacks:PackIconMaterialDesign Kind="Person" Width="26" Height="30" Foreground="{StaticResource Dcms.Primary}" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                    </Border>
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="72,0,0,0">
+                        
+                        <TextBlock Text="إدارة المستخدمين والصلاحيات" Foreground="White" FontSize="23" FontWeight="Bold" />
+                        <TextBlock Text="إدارة حسابات المستخدمين والتحكم في صلاحيات الوصول إلى النظام" Foreground="#DCEBFA" FontSize="12" Margin="0,7,0,0" />
+                    </StackPanel>
+                    <Border Background="#FFFFFF" CornerRadius="10" Padding="15,9" VerticalAlignment="Top" Margin="519,0,481,0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="عدد المستخدمين" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center" Margin="0,0,10,0" />
+                            <TextBlock x:Name="txtUsersCount" Text="{Binding UsersCount}" Foreground="{StaticResource MainBlue}" FontSize="21" FontWeight="Bold" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+            <!-- ===================================== -->
+            <!-- شريط الأدوات -->
+            <!-- ===================================== -->
+            <Border Grid.Row="1" Background="White" BorderBrush="{StaticResource Dmc.Border}" BorderThickness="1" CornerRadius="12" Padding="12" Margin="0,0,0,14">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <dxg:GridSearchControl x:Name="txtSearch" dx:ThemeManager.ThemeName="Win11Light" View="{Binding ElementName=View}" DataObject.Pasting="TxtName_Pasting" Loaded="TxtName_Loaded" Grid.Column="0" Height="38" Width="300" HorizontalAlignment="Right" VerticalContentAlignment="Center" NullText="ابحث باسم المستخدم..." Margin="0,14,876,10" />
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <!--<Button Style="{StaticResource ActionButton}"
+                            Content="تحديث"
+                            Background="#EAF2FC"
+                            Foreground="{StaticResource MainBlue}"
+                            BorderThickness="0"
+                            Click="btnRefresh_Click"/>
+
+                        <Button Style="{StaticResource ActionButton}"
+                            Content="حفظ التعديلات"
+                            Background="{StaticResource MainTeal}"
+                            Foreground="White"
+                            BorderThickness="0"
+                            Click="btnSave_Click"/>-->
+                    </StackPanel>
+                </Grid>
+            </Border>
+            <!-- ===================================== -->
+            <!-- بطاقات المستخدمين -->
+            <!-- ===================================== -->
+            <Border Grid.Row="2" Background="White" BorderBrush="{StaticResource Dmc.Border}" BorderThickness="1" CornerRadius="12" Padding="8">
+                <dxg:GridControl x:Name="gridUsers" dx:ThemeManager.ThemeName="Win11Light" AutoGenerateColumns="None" SelectionMode="None" EnableSmartColumnsGeneration="False" ItemsSource="{Binding ItemsSource}">
+                    <!-- Field descriptors used by the instant-feedback card template. -->
+                    <dxg:GridControl.Columns>
+                        <dxg:GridColumn FieldName="User_ID" Visible="False" />
+                        <dxg:GridColumn FieldName="User_Name" Visible="False" />
+                        <dxg:GridColumn FieldName="forbuild" Visible="False" />
+                        <dxg:GridColumn FieldName="foremp" Visible="False" />
+                        <dxg:GridColumn FieldName="forlocation" Visible="False" />
+                        <dxg:GridColumn FieldName="formaint" Visible="False" />
+                        <dxg:GridColumn FieldName="fordon" Visible="False" />
+                        <dxg:GridColumn FieldName="formaintrepo" Visible="False" />
+                        <dxg:GridColumn FieldName="formangreq" Visible="False" />
+                        <dxg:GridColumn FieldName="foruser" Visible="False" />
+                        <dxg:GridColumn FieldName="forservices" Visible="False" />
+                        <dxg:GridColumn FieldName="mang_check" Visible="False" />
+                        <dxg:GridColumn FieldName="branch_report" Visible="False" />
+                         <dxg:GridColumn FieldName="OperationCount" Visible="False" />
+                    </dxg:GridControl.Columns>
+                    <dxg:GridControl.View>
+                        <dxg:CardView SearchColumns="User_Name" SearchPanelAllowFilter="True" SearchPanelFindMode="Always" SearchDelay="200" ShowSearchPanelMode="Never" x:Name="View" CardLayout="Rows" MaxCardCountInRow="4" ShowGroupPanel="False" ShowColumnHeaders="False" ShowCardExpandButton="False" AllowCardResizing="False" AllowColumnMoving="False" NavigationStyle="Row" AllowEditing="False" SearchStringToFilterCriteria="View_SearchStringToFilterCriteria" SearchPanelFindFilter="StartsWith">
+                            <dxg:CardView.CardTemplate>
+                                <DataTemplate>
+                                    <Border x:Name="UserCardBorder" Width="230" Height="245" Margin="8" Padding="16" Background="White" BorderBrush="{StaticResource Dmc.Border}" BorderThickness="1" CornerRadius="14" Tag="{Binding DataContext.User_ID}" Cursor="Hand" ToolTip="انقر مرة لتحديد المستخدم، ومرتين لعرض صلاحياته وتعديلها" MouseLeftButtonDown="UserCard_MouseLeftButtonDown">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="36" />
+                                                <RowDefinition Height="*" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+                                            <Border x:Name="UserAvatarBackground" Grid.Row="1" Width="88" Height="88" Margin="0,0,0,12" HorizontalAlignment="Center" VerticalAlignment="Center" Background="#EAF2FC" CornerRadius="44">
+                                                <iconPacks:PackIconMaterial x:Name="UserAvatarIcon" Kind="Account" Width="48" Height="48" Foreground="{StaticResource MainBlue}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+                                            <TextBlock x:Name="UserNameText" Grid.Row="2" Text="{Binding DataContext.User_Name}" ToolTip="{Binding DataContext.User_Name}" HorizontalAlignment="Center" TextAlignment="Center" TextTrimming="CharacterEllipsis" FontSize="16" FontWeight="Bold" Foreground="{StaticResource TextDark}" Margin="4,4,4,2" />
+                                            <TextBlock x:Name="UserPermissionCountText" Grid.Row="3" HorizontalAlignment="Center" FontSize="11" Foreground="{StaticResource MainBlue}" Margin="4,3,4,0">
+                                                <TextBlock.Text>
+                                                    <MultiBinding Converter="{StaticResource UserPermissionCountConverter}">
+                                                        <Binding Path="DataContext.forbuild" />
+                                                        <Binding Path="DataContext.foremp" />
+                                                        <Binding Path="DataContext.forlocation" />
+                                                        <Binding Path="DataContext.formaint" />
+                                                        <Binding Path="DataContext.fordon" />
+                                                        <Binding Path="DataContext.formaintrepo" />
+                                                        <Binding Path="DataContext.formangreq" />
+                                                        <Binding Path="DataContext.foruser" />
+                                                        <Binding Path="DataContext.forservices" />
+                                                        <Binding Path="DataContext.mang_check" />
+                                                        <Binding Path="DataContext.branch_report" />
+                                                    </MultiBinding>
+                                                </TextBlock.Text>
+                                            </TextBlock>
+                                            <TextBlock x:Name="UserOperationCountText" Grid.Row="4" HorizontalAlignment="Center" FontSize="12"
+                          FontWeight="SemiBold" Foreground="{StaticResource MainBlue}" Margin="4,8,4,0"
+                          Text="{Binding DataContext.OperationCount, StringFormat='عدد العمليات: {0:N0}', FallbackValue='عدد العمليات: —'}"/>
+                                            <Button x:Name="btnCancel" ToolTip="اضغط لحذف المستخدم" Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Top" Style="{StaticResource DeleteUserButton}" CommandParameter="{Binding DataContext.User_ID}" Click="btnDeleteUser_Click">
+                                                <StackPanel>
+                                                    <iconPacks:PackIconBootstrapIcons Kind="XCircle" Foreground="#FF0152A4" Width="29" Height="26" Margin="-2,-2,0,0" />
+                                                </StackPanel>
+                                            </Button>
+                                        </Grid>
+                                    </Border>
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                            <Setter TargetName="UserCardBorder" Property="Background" Value="#142D4E" />
+                                            <Setter TargetName="UserCardBorder" Property="BorderBrush" Value="#142D4E" />
+                                            <Setter TargetName="UserNameText" Property="Foreground" Value="White" />
+                                            <Setter TargetName="UserPermissionCountText" Property="Foreground" Value="#DCEBFA" />
+                                            <Setter TargetName="UserOperationCountText" Property="Foreground" Value="#DCEBFA" />
+                                            <Setter TargetName="UserAvatarBackground" Property="Background" Value="#244566" />
+                                            <Setter TargetName="UserAvatarIcon" Property="Foreground" Value="White" />
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </dxg:CardView.CardTemplate>
+                        </dxg:CardView>
+                    </dxg:GridControl.View>
+                </dxg:GridControl>
+            </Border>
+            <!-- ===================================== -->
+            <!-- تذييل الصفحة -->
+            <!-- ===================================== -->
+            <Button x:Name="btnNewUser" Grid.Row="2" Style="{StaticResource NewUserFloatingButton}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="20,0,20,20" AutomationProperties.Name="إضافة مستخدم جديد" IsEnabled="{Binding IsEnabled, ElementName=btnApplyPermissionChanges}" Click="NewUser_Click">
+                <iconPacks:PackIconMaterial Kind="Plus" Width="28" Height="28" Foreground="White" IsHitTestVisible="False" />
+            </Button>
+            <TextBlock Grid.Row="3" Text="منظومة المحفوظات | إدارة المستخدمين" Foreground="{StaticResource TextMuted}" FontSize="11" Margin="4,10,4,0" HorizontalAlignment="Center" />
+            <Button x:Name="btnCancel" ToolTip="اضغط للإلغاء واغلاق النافذة" Click="btnCancel_Click" Visibility="Visible" Height="37" Width="36" FontFamily="Segoe UI" FontSize="15" FontWeight="Bold" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" BorderBrush="{x:Null}" BorderThickness="0" Background="#32DF6363" Margin="1166,17,0,0" Style="{StaticResource Dmc.SecondaryButton}" Padding="0">
+                <iconPacks:PackIconBootstrapIcons Kind="XCircle" Foreground="White" Width="22" Height="22" />
+            </Button>
+            <mah:Flyout Grid.RowSpan="4" x:Name="edit_panel" Header="" HeaderTemplate="{StaticResource CustomHeaderTemplate}" IsModal="False" IsPinned="False" Position="Bottom" Theme="Light" Margin="-16,0,-19,-19" BorderThickness="2" AnimateOnPositionChange="True" AllowFocusElement="True" AreAnimationsEnabled="True" AnimateOpacity="True" VerticalAlignment="Bottom" Height="751">
+                <mah:Flyout.Background>
+                    <SolidColorBrush Color="White" Opacity="0.7" />
+                </mah:Flyout.Background>
+                <Border x:Name="permissionFlyoutPanel" FlowDirection="RightToLeft" Width="440" MaxHeight="690" Margin="350,6,0,6" Padding="20" HorizontalAlignment="Left" Background="White" BorderBrush="{StaticResource Dmc.Border}" BorderThickness="1" CornerRadius="18">
+                    <Grid Margin="-11,-11,-11,-11" Width="420">
+                        <Border Background="#F3F7FC" CornerRadius="12" Padding="14" Margin="0,-1,0,346" Width="420">
+                            <Grid Margin="-14,-14,-14,-4" Width="420">
+                                <TextBlock x:Name="txtPanelTitle" Text="صلاحيات المستخدم" FontSize="17" FontWeight="Bold" Foreground="{StaticResource TextDark}" Margin="0,24,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" />
+                                <TextBlock Text="اسم المستخدم" FontSize="13" FontWeight="SemiBold" Foreground="#334155" Margin="14,73,299,225" Width="107" Height="17" />
+                                <dxe:TextEdit PreviewKeyUp="txtUserName_PreviewKeyUp" Validation.ErrorTemplate="{StaticResource errorTemplateSilverlightStyle3}" EditValueChanging="txtUserName_EditValueChanging" TabIndex="101" x:Name="txtUserName" dx:ThemeManager.ThemeName="Win11Light" Height="40" MaxLength="100" NullText="أدخل اسم المستخدم" BorderThickness="1" HorizontalContentAlignment="Center" Width="360" Margin="12,102,48,173" ShowError="False" ShowErrorToolTip="True" FontSize="14" Style="{StaticResource Dmc.TextInput}">
+                                    <dxe:TextEdit.Tag>
+                                        <Binding RelativeSource="{RelativeSource Mode=Self}" Path="Tag" Mode="TwoWay" UpdateSourceTrigger="Explicit" NotifyOnValidationError="True" ValidatesOnDataErrors="True" ValidatesOnExceptions="True" ValidatesOnNotifyDataErrors="True">
+                                            <Binding.ValidationRules>
+                                                <conv:ErrorRule />
+                                            </Binding.ValidationRules>
+                                        </Binding>
+                                    </dxe:TextEdit.Tag>
+                                </dxe:TextEdit>
+                                <!-- كلمة المرور -->
+                                <TextBlock Text="كلمة المرور" FontSize="13" FontWeight="SemiBold" Foreground="#334155" Margin="14,145,311,147" />
+                                <dxe:PasswordBoxEdit Validation.ErrorTemplate="{StaticResource errorTemplateSilverlightStyle3}" TabIndex="102" x:Name="txtPassword" ShowError="False" ShowErrorToolTip="True" PreviewKeyUp="txtPassword_PreviewKeyUp" EditValueChanged="txtPassword_EditValueChanged" MaxLength="12" PasswordChar="•" dx:ThemeManager.ThemeName="Win11Light" ShowPasswordButtonVisibility="Auto" Margin="8,145,48,80" Padding="10,8" FontSize="14" FlowDirection="RightToLeft" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderThickness="1" NullText="أدخل كلمة المرور" Width="364" Height="40" Style="{StaticResource Dmc.PasswordInput}">
+                                    <dxe:PasswordBoxEdit.Tag>
+                                        <Binding RelativeSource="{RelativeSource Mode=Self}" Path="Tag" Mode="TwoWay" UpdateSourceTrigger="Explicit" NotifyOnValidationError="True" ValidatesOnDataErrors="True" ValidatesOnExceptions="True" ValidatesOnNotifyDataErrors="True">
+                                            <Binding.ValidationRules>
+                                                <conv:ErrorRule />
+                                            </Binding.ValidationRules>
+                                        </Binding>
+                                    </dxe:PasswordBoxEdit.Tag>
+                                </dxe:PasswordBoxEdit>
+                                <!-- تأكيد كلمة المرور -->
+                                <TextBlock Text="تأكيد كلمة المرور" FontSize="13" FontWeight="SemiBold" Foreground="#334155" Margin="14,226,305,63" />
+                                <dxe:PasswordBoxEdit Validation.ErrorTemplate="{StaticResource errorTemplateSilverlightStyle3}" TabIndex="103" ShowError="False" ShowErrorToolTip="True" x:Name="txtConfirmPassword" dx:ThemeManager.ThemeName="Win11Light" PreviewKeyUp="txtConfirmPassword_PreviewKeyUp" EditValueChanged="txtConfirmPassword_EditValueChanged" ShowCapsLockWarningToolTip="True" PasswordChar="•" ShowPasswordButtonVisibility="Auto" Margin="8,253,48,22" Padding="10,8" FontSize="14" FlowDirection="RightToLeft" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderThickness="1" NullText="أعد إدخال كلمة المرور" Width="364" Height="40" Style="{StaticResource Dmc.PasswordInput}">
+                                    <dxe:PasswordBoxEdit.Tag>
+                                        <Binding RelativeSource="{RelativeSource Mode=Self}" Path="Tag" Mode="TwoWay" UpdateSourceTrigger="Explicit" NotifyOnValidationError="True" ValidatesOnDataErrors="True" ValidatesOnExceptions="True" ValidatesOnNotifyDataErrors="True">
+                                            <Binding.ValidationRules>
+                                                <conv:ErrorRule />
+                                            </Binding.ValidationRules>
+                                        </Binding>
+                                    </dxe:PasswordBoxEdit.Tag>
+                                </dxe:PasswordBoxEdit>
+                                <!-- الأيقونة -->
+                                <Border Height="48" CornerRadius="21" Background="#E2EEFC" VerticalAlignment="Top" Margin="0,0,367,0" Width="53">
+                                    <iconPacks:PackIconMaterial Kind="ShieldAccount" Width="23" Height="23" Foreground="{StaticResource MainBlue}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                                <!-- إغلاق -->
+                                <Button x:Name="PermissionCloseButton" ToolTip="إغلاق النافذة" Click="ClosePermissionFlyout_Click" Height="37" FontSize="15" FontWeight="Bold" Foreground="White" BorderThickness="0" Background="#2570BA" Margin="371,10,10,218" Style="{StaticResource Dmc.SecondaryButton}" Padding="0">
+                                    <iconPacks:PackIconBootstrapIcons Kind="XCircle" Foreground="White" Width="24" Height="24" />
+                                </Button>
+                            </Grid>
+                        </Border>
+                        <StackPanel Width="420" Margin="0,299,0,75">
+                            <TextBlock Text="صلاحيات الوصول إلى الشاشات" Style="{StaticResource PermissionHeader}" FontSize="14" Width="402" />
+                            <Border Background="#EAF2FC" BorderBrush="#D5E5F7" BorderThickness="1" CornerRadius="10" Padding="12" Margin="0,0,0,12">
+                                <CheckBox PreviewKeyUp="chkAllPermissions_PreviewKeyUp" dx:ThemeManager.ThemeName="Win11Light" x:Name="chkAllPermissions" TabIndex="104" Content="تفعيل أو إلغاء جميع الصلاحيات" IsThreeState="True" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource MainBlue}" VerticalContentAlignment="Center" Click="ToggleAllPermissions_Click" />
+                            </Border>
+                            <Border Background="#FBFCFE" BorderBrush="#E1E8F0" BorderThickness="1" CornerRadius="12" Padding="12" Height="210">
+                                <UniformGrid Columns="2" Margin="0,0,0,-3">
+                                    <CheckBox PreviewKeyUp="chkIssued_PreviewKeyUp" TabIndex="105" dx:ThemeManager.ThemeName="Win11Light" x:Name="chkIssued" Content="تكليف الصيانة" Style="{StaticResource PermissionCheck}" IsChecked="{Binding formaint, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,6,0,0" />
+                                    <CheckBox TabIndex="106" PreviewKeyUp="chkIncoming_PreviewKeyUp" dx:ThemeManager.ThemeName="Win11Light" x:Name="chkIncoming" Content="الادرات والاقسام" Style="{StaticResource PermissionCheck}" IsChecked="{Binding mang_check, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,6,0,0" />
+                                    <CheckBox TabIndex="107" PreviewKeyUp="chkIssuedArchive_PreviewKeyUp" dx:ThemeManager.ThemeName="Win11Light" x:Name="chkIssuedArchive" Content="فنيو الصيانة" Style="{StaticResource PermissionCheck}" IsChecked="{Binding foremp, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,6,0,-1" />
+                                    <CheckBox TabIndex="108" PreviewKeyUp="chkIncomingArchive_PreviewKeyUp" dx:ThemeManager.ThemeName="Win11Light" x:Name="chkIncomingArchive" Content="ادرات واقسام طلب الصيانة" Style="{StaticResource PermissionCheck}" IsChecked="{Binding formangreq, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,6,0,-1" />
+                                    <CheckBox TabIndex="109" PreviewKeyUp="chkExplorer_PreviewKeyUp" dx:ThemeManager.ThemeName="Win11Light" x:Name="chkExplorer" Content="بيان الصيانة" Style="{StaticResource PermissionCheck}" IsChecked="{Binding forservices, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,6,0,0" />
+                                    <CheckBox TabIndex="110" PreviewKeyUp="chkClass_PreviewKeyUp" dx:ThemeManager.ThemeName="Win11Light" x:Name="chkClass" Content="تقارير الصيانة" Style="{StaticResource PermissionCheck}" IsChecked="{Binding formaintrepo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,6,0,0" />
+                                    <CheckBox TabIndex="111" PreviewKeyUp="chkEciver_PreviewKeyUp" dx:ThemeManager.ThemeName="Win11Light" x:Name="chkEciver" Content="المباني" Style="{StaticResource PermissionCheck}" IsChecked="{Binding forbuild, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,6,0,0" />
+                                    <CheckBox TabIndex="112" PreviewKeyUp="chkEmail_PreviewKeyUp" dx:ThemeManager.ThemeName="Win11Light" x:Name="chkEmail" Content="إدارة المستخدمين" Style="{StaticResource PermissionCheck}" IsChecked="{Binding foruser, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,6,0,0" />
+                                    <CheckBox TabIndex="113" PreviewKeyUp="chkWhatsapp_PreviewKeyUp" dx:ThemeManager.ThemeName="Win11Light" x:Name="chkWhatsapp" Content="المقرات" Style="{StaticResource PermissionCheck}" IsChecked="{Binding forlocation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,6,0,-1" />
+                                    <CheckBox TabIndex="114" PreviewKeyUp="CompletionPermission_PreviewKeyUp" x:Name="CompletionPermission" Content="إنهاء الصيانة"
+                                              Style="{StaticResource PermissionCheck}" IsChecked="{Binding fordon, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,6,0,0" />
+                                    <CheckBox TabIndex="115" PreviewKeyUp="chkNewYear_PreviewKeyUp" dx:ThemeManager.ThemeName="Win11Light" x:Name="chkNewYear" Content="تقارير الفروع" Style="{StaticResource PermissionCheck}" IsChecked="{Binding branch_report, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,6,0,0" />
+                                </UniformGrid>
+                            </Border>
+                        </StackPanel>
+                        <Button x:Name="btnApplyPermissionChanges" TabIndex="116" Content="تم" Margin="0,603,0,9" Background="{StaticResource MainBlue}" Foreground="White" BorderThickness="0" FontWeight="SemiBold" Cursor="Hand" Click="ApplyPermissionChanges_Click" Width="420" Style="{StaticResource Dmc.SecondaryButton}" />
+                    </Grid>
+                </Border>
+            </mah:Flyout>
+            <!-- نافذة جانبية لتعديل صلاحيات المستخدم المحدد -->
+        </Grid>
+    </Border>
+</mah:MetroWindow>

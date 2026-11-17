@@ -1,0 +1,34 @@
+<UserControl x:Class="Maintenance_app.orders_Windows.MaintenanceFlyoutHeader"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:icons="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             FlowDirection="RightToLeft" dx:ThemeManager.ThemeName="Win11Light">
+    <UserControl.Resources>
+        <LinearGradientBrush x:Key="Order.Hero" StartPoint="1,0" EndPoint="0,1">
+            <GradientStop Color="#182A50" Offset="0" />
+            <GradientStop Color="#324D82" Offset="0.68" />
+            <GradientStop Color="#456DB0" Offset="1" />
+        </LinearGradientBrush>
+    </UserControl.Resources>
+    <!-- نفس تكوين بطاقة DCMS، بألوان الترويسة والأيقونات المعتمدة في منظومة الصيانة. -->
+    <Border x:Name="FlyoutHeaderSurface" Height="64" CornerRadius="18,18,0,0" Background="{DynamicResource Order.Hero}" Padding="18,10">
+        <Grid>
+            <Grid.ColumnDefinitions><ColumnDefinition Width="44" /><ColumnDefinition Width="*" /><ColumnDefinition Width="38" /></Grid.ColumnDefinitions>
+            <Border Width="40" Height="40" CornerRadius="10" Background="#25FFFFFF">
+                <icons:PackIconMaterial x:Name="HeaderIcon" Kind="{Binding Tag, RelativeSource={RelativeSource AncestorType={x:Type mah:Flyout}}}"
+                                        Width="24" Height="24" Foreground="{DynamicResource Maintenance.Flyout.HeaderIcon}"
+                                        HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+            <TextBlock x:Name="HeaderTitle" Grid.Column="1" Text="{Binding Header, RelativeSource={RelativeSource AncestorType={x:Type mah:Flyout}}}"
+                       Foreground="White" FontSize="20" FontWeight="SemiBold" VerticalAlignment="Center" Margin="12,0" TextWrapping="Wrap" />
+            <dx:SimpleButton x:Name="FlyoutCloseButton" Grid.Column="2" Width="36" Height="36" Padding="0"
+                             Click="CloseFlyout_Click" ToolTip="إغلاق اللوحة" AutomationProperties.Name="إغلاق اللوحة"
+                             Background="#32DF6363" Foreground="White" BorderBrush="#50FFFFFF"
+                             HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                <icons:PackIconMaterial Kind="Close" Width="22" Height="22" />
+            </dx:SimpleButton>
+        </Grid>
+    </Border>
+</UserControl>

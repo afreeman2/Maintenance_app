@@ -1,0 +1,123 @@
+﻿<mah:MetroWindow
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+ xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+ xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+ xmlns:icons="http://metro.mahapps.com/winfx/xaml/iconpacks"
+                         xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+
+ xmlns:vm="clr-namespace:Maintenance_app.viewo_Model"
+ xmlns:orders="clr-namespace:Maintenance_app.Reports"
+ xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d"
+   x:Class="Maintenance_app.Reports.daliy_services_window"
+ Title="طباعة نموذج الفحص اليومي" Width="760" Height="510" 
+BorderBrush="{x:Null}" WindowStyle="None" AllowsTransparency="True"
+ShowTitleBar="False" IsCloseButtonEnabled="False" ShowCloseButton="False" 
+Background="{x:Null}"  ResizeMode="NoResize" WindowStartupLocation="CenterScreen"
+FlowDirection="RightToLeft" dx:ThemeManager.ThemeName="Win11Light"  Loaded="Window_Loaded">
+    <mah:MetroWindow.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Maintenance_app;component/Resources/AccountTheme.xaml"/>
+                <ResourceDictionary Source="/Maintenance_app;component/Resources/DcmsTheme.xaml"/>
+                <ResourceDictionary Source="/Maintenance_app;component/Resources/AccessibleEditors.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <!-- تجمع البطاقة الأيقونة والمحرر، وتحافظ على تمييز القيمة حتى أثناء التركيز. -->
+            <Style x:Key="Daily.Field" TargetType="{x:Type Border}" BasedOn="{StaticResource Dcms.Field}">
+                <Setter Property="vm:InputFieldState.Enabled" Value="True"/>
+                <Style.Triggers>
+                    <Trigger Property="vm:InputFieldState.HasValue" Value="True">
+                        <Setter Property="Background" Value="#DFE8F3"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <Style x:Key="Daily.Editor" TargetType="{x:Type dxe:BaseEdit}">
+                <Setter Property="Template" Value="{StaticResource Accessible.EditorTemplate}"/>
+                <Setter Property="Height" Value="48"/>
+                <Setter Property="Padding" Value="36,4"/>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="ShowBorder" Value="False"/>
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                <Setter Property="ShowError" Value="False"/>
+                <Setter Property="Validation.ErrorTemplate" Value="{DynamicResource errorTemplateSilverlightStyle}"/>
+                <Style.Triggers>
+                    <Trigger Property="Validation.HasError" Value="True">
+                        <Setter Property="ToolTip" Value="{Binding (Validation.Errors)[0].ErrorContent, RelativeSource={RelativeSource Mode=Self}}"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+        </ResourceDictionary>
+    </mah:MetroWindow.Resources>
+  
+
+    <Border  Margin="-1,11,0,0"  VerticalAlignment="Top" Style="{StaticResource Account.Card}" Background="White">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="80"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Border Background="{StaticResource Order.Hero}" CornerRadius="17,17,0,0" Padding="24,0">
+                <DockPanel>
+                    <StackPanel Orientation="Horizontal" Width="636" Height="40">
+                        <iconPacks:PackIconMaterial Kind="ClipboardCheckOutline" Width="28" Height="28" Foreground="#EACD8C" Margin="0,0,12,0"/>
+                        <TextBlock Text="طباعة نموذج الفحص اليومي" Foreground="White" FontSize="24" FontWeight="SemiBold"/>
+                    </StackPanel>
+                    <Button x:Name="closeconfig" Click="Close_Click" Visibility="Visible" Width="46" FontFamily="Segoe UI" FontSize="15" FontWeight="Bold" Foreground="White" BorderBrush="{x:Null}" BorderThickness="0" Background="#32DF6363" Style="{StaticResource Dmc.SecondaryButton}" Panel.ZIndex="10" Padding="0" DockPanel.Dock="Right">
+                        <iconPacks:PackIconBootstrapIcons Kind="XCircle" Foreground="White" Width="32" Height="34" />
+                    </Button>
+                </DockPanel>
+            </Border>
+            <StackPanel Grid.Row="1" Margin="28,24">
+                <TextBlock Text="المبنى" Style="{StaticResource Account.Label}"/>
+                <Border Style="{StaticResource Daily.Field}">
+                    <Grid>
+                        <vm:AccessibleStatisticsComboBox x:Name="Combo_Buildings" Style="{StaticResource Daily.Editor}" IsTextEditable="False"
+                            DisplayMember="Build" NullText="اختر المبنى" EditValueChanged="Field_Changed"
+                            PreviewTextInput="Field_Typing" PreviewKeyDown="Building_KeyDown"/>
+                        <iconPacks:PackIconMaterial Kind="OfficeBuildingOutline" Width="21" Height="22" Margin="10,0,0,0" Foreground="#315EA9" IsHitTestVisible="False" VerticalAlignment="Center"/>
+                    </Grid>
+                </Border>
+                <TextBlock Text="التاريخ" Style="{StaticResource Account.Label}" Margin="0,18,0,5"/>
+                <Border Style="{StaticResource Daily.Field}">
+                    <Grid>
+                        <vm:AccessibleDateEdit x:Name="date_br_begin" Style="{StaticResource Daily.Editor}" Mask="dd/MM/yyyy"
+                            MaskUseAsDisplayFormat="True" EditValueChanged="Field_Changed" PreviewTextInput="Field_Typing" PreviewKeyDown="Date_KeyDown"/>
+                        <iconPacks:PackIconMaterial Kind="CalendarMonthOutline" Width="21" Height="22" Margin="10,0,0,0" Foreground="#315EA9" IsHitTestVisible="False" VerticalAlignment="Center"/>
+                    </Grid>
+                </Border>
+                <TextBlock Text="الفاحص" Style="{StaticResource Account.Label}" Margin="0,18,0,5"/>
+                <Border Style="{StaticResource Daily.Field}">
+                    <Grid>
+                        <vm:AccessibleStatisticsComboBox x:Name="Combo_Check_Man" Style="{StaticResource Daily.Editor}" IsTextEditable="False"
+                            DisplayMember="Emp_Name" NullText="اختر الفاحص" EditValueChanged="Field_Changed"
+                            PreviewTextInput="Field_Typing" PreviewKeyDown="Inspector_KeyDown"/>
+                        <iconPacks:PackIconMaterial Kind="AccountCheckOutline" Width="21" Height="22" Margin="10,0,0,0" Foreground="#315EA9" IsHitTestVisible="False" VerticalAlignment="Center"/>
+                    </Grid>
+                </Border>
+            </StackPanel>
+            <Border Grid.Row="2" BorderBrush="#D9E2ED" BorderThickness="0,1,0,0" Padding="24,16">
+                <StackPanel>
+                    <TextBlock x:Name="StatusText" Foreground="#526C90" TextWrapping="Wrap" Margin="0,0,0,12"/>
+                    <StackPanel Orientation="Horizontal">
+                        <dx:SimpleButton x:Name="PrintButton" Click="Print_Click" Style="{StaticResource Account.Button}" Background="#315EA9" Foreground="White">
+                            <StackPanel Orientation="Horizontal">
+                                <iconPacks:PackIconMaterial Kind="PrinterOutline" Width="20" Height="20" Margin="0,0,8,0"/>
+                                <TextBlock Text="معاينة وطباعة"/>
+                            </StackPanel>
+                        </dx:SimpleButton>
+                        <dx:SimpleButton Click="Close_Click" Style="{StaticResource Account.Button}">
+                            <StackPanel Orientation="Horizontal">
+                                <iconPacks:PackIconMaterial Kind="Close" Width="20" Height="20" Margin="0,0,8,0"/>
+                                <TextBlock Text="إلغاء"/>
+                            </StackPanel>
+                        </dx:SimpleButton>
+                        <dx:WaitIndicator x:Name="LoadingIndicator" DeferedVisibility="False" Margin="12,0"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Border>
+</mah:MetroWindow>

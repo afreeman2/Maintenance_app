@@ -1,0 +1,302 @@
+<mah:MetroWindow xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+                 xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls" 
+                 xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+                 xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+                 xmlns:icons="http://metro.mahapps.com/winfx/xaml/iconpacks" 
+                 xmlns:child="http://metro.mahapps.com/winfx/xaml/simplechildwindow"
+                         xmlns:local="clr-namespace:Maintenance_app.converts"
+                xmlns:vm="clr-namespace:Maintenance_app.viewo_Model"   
+                 
+x:Class="Maintenance_app.main_Windows.Login_Windows" dx:ThemeManager.ThemeName="Win11Light"
+                 Title="تسجيل الدخول | الخدمات والصيانة" Width="1080" Height="720" MinWidth="900" MinHeight="620" Loaded="MetroWindow_Loaded" WindowStartupLocation="CenterScreen" WindowStyle="None" AllowsTransparency="True" ResizeMode="NoResize" ShowTitleBar="False" ShowCloseButton="False" ShowMinButton="False" ShowMaxRestoreButton="False" TitleAlignment="Center" Background="Transparent" BorderThickness="0" GlowBrush="{x:Null}" FlowDirection="RightToLeft" FontFamily="Segoe UI" FontSize="14" UseLayoutRounding="True" SnapsToDevicePixels="True" TextOptions.TextFormattingMode="Display" Icon="pack://application:,,,/Maintenance_app;component/Resources/maintenance-crossed-tools.ico" WindowButtonCommandsOverlayBehavior="Never" NonActiveGlowBrush="{x:Null}" SizeToContent="Manual">
+    <mah:MetroWindow.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Resources/DcmsTheme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <SolidColorBrush x:Key="Client.Ink" Color="#233B54"/>
+            <ControlTemplate x:Key="Client.Error">
+                <Grid>
+                    <Border BorderBrush="#C62836" BorderThickness="2" CornerRadius="7">
+                        <AdornedElementPlaceholder/>
+                    </Border>
+                    <Border Width="18" Height="18" Background="#C62836" CornerRadius="9" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-6,-6,0,0">
+                        <TextBlock Text="!" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    </Border>
+                </Grid>
+            </ControlTemplate>
+            <Style x:Key="Client.Input" TargetType="Control">
+                <Setter Property="local:FieldFeedback.Enabled" Value="True"/>
+                <Setter Property="MinHeight" Value="44"/>
+                <Setter Property="FontSize" Value="15"/>
+                <Setter Property="Foreground" Value="{StaticResource Client.Ink}"/>
+                <Setter Property="Background" Value="#F7F9FC"/>
+                <Setter Property="BorderBrush" Value="#B8C9DB"/>
+                <Setter Property="Padding" Value="10,6"/>
+                <Setter Property="Validation.ErrorTemplate" Value="{StaticResource Client.Error}"/>
+                <Style.Triggers>
+                    <Trigger Property="local:FieldFeedback.HasValue" Value="True">
+                        <Setter Property="Background" Value="#DFE8F3"/>
+                    </Trigger>
+                    <Trigger Property="Validation.HasError" Value="True">
+                        <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)[0].ErrorContent}"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <Style x:Key="Client.ErrorText" TargetType="TextBlock">
+                <Setter Property="Visibility" Value="Collapsed"/>
+                <Setter Property="Foreground" Value="#BD2535"/>
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="TextWrapping" Value="Wrap"/>
+                <Setter Property="Margin" Value="0,5,0,0"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Tag.(Validation.HasError), RelativeSource={RelativeSource Self}}" Value="True">
+                        <Setter Property="Visibility" Value="Visible"/>
+                        <Setter Property="Text" Value="{Binding Tag.(Validation.Errors)[0].ErrorContent, RelativeSource={RelativeSource Self}}"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style x:Key="Client.Label" TargetType="TextBlock">
+                <Setter Property="Foreground" Value="{StaticResource Client.Ink}"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="Margin" Value="0,0,0,8"/>
+            </Style>
+            <SolidColorBrush x:Key="Client.Blue" Color="#536F8C"/>
+
+            <!-- تدرجات كحلية وذهبية متوافقة مع هوية الرئيسية، مع سطح فاتح واضح لحقول الدخول. -->
+            <LinearGradientBrush x:Key="Login.FormBackground" StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#FFFFFF" Offset="0" />
+                <GradientStop Color="#F6F8FC" Offset="0.68" />
+                <GradientStop Color="#EBF0F8" Offset="1" />
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="Login.BrandBackground" StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#101E35" Offset="0" />
+                <GradientStop Color="#20395E" Offset="0.55" />
+                <GradientStop Color="#162740" Offset="1" />
+            </LinearGradientBrush>
+        </ResourceDictionary>
+    </mah:MetroWindow.Resources>
+    <Border x:Name="LoginSurface" Margin="0" Background="{StaticResource Login.FormBackground}" CornerRadius="18" BorderBrush="{StaticResource Dcms.Line}" BorderThickness="1" vm:RoundedSurface.Radius="18" MouseLeftButtonDown="LoginSurface_MouseLeftButtonDown">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.96*"/>
+                <ColumnDefinition Width="1.04*"/>
+            </Grid.ColumnDefinitions>
+            <Grid Margin="42,30,42,26">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <StackPanel Orientation="Horizontal">
+                    <Border Width="50" Height="50" Background="White" BorderBrush="{StaticResource Dcms.Line}" BorderThickness="1" CornerRadius="12" Margin="0,0,12,0">
+                        <Image Source="pack://application:,,,/Maintenance_app;component/Resources/ssf Logo.jpg" Margin="5" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality"/>
+                    </Border>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="الخدمات والصيانة" FontSize="19" FontWeight="SemiBold" Foreground="{StaticResource Dcms.Ink}"/>
+                        <TextBlock Text="صندوق الضمان الاجتماعي" FontSize="13" Foreground="{StaticResource Dcms.Muted}" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </StackPanel>
+                <StackPanel VerticalAlignment="Center" Margin="0,18,0,12" Grid.Row="1">
+                    <Border Width="42" Height="4" Background="{StaticResource Dcms.Gold}" CornerRadius="2" HorizontalAlignment="Left" Margin="0,0,0,18"/>
+                    <TextBlock FontSize="30" FontWeight="Bold" Foreground="{StaticResource Dcms.Deep}" HorizontalAlignment="Center"><Run FlowDirection="RightToLeft" Language="ar-ly" Text="تسجيل الدخول"/></TextBlock>
+                    <TextBlock Text="سجّل الدخول لاصدار اومر الصيانة وانجازها." FontSize="14" Foreground="{StaticResource Dcms.Muted}" Margin="0,8,0,20" TextWrapping="Wrap" HorizontalAlignment="Center"/>
+                    <Label Content="المستخدم" Target="{Binding ElementName=cboUserFullName}" Padding="0" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource Dcms.Ink}" Margin="0,0,0,9"/>
+                    <Border Style="{StaticResource Dcms.Field}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="46"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <iconPacks:PackIconMaterial Kind="AccountOutline" Width="21" Height="21" Foreground="{StaticResource Dcms.Primary}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <dxe:ComboBoxEdit dx:ThemeManager.ThemeName="Win11Light" x:Name="cboUserFullName" Style="{StaticResource Client.Input}" ShowError="False" ShowErrorToolTip="False" Grid.Column="1" FontSize="16" Height="48" ItemsSource="{Binding T_SystemUser}" DisplayMember="User_Name" ValueMember="User_ID" IsTextEditable="False" ImmediatePopup="True" NullText="اختر المستخدم" ShowBorder="False" Background="Transparent" BorderThickness="0" Padding="8,0" Foreground="{StaticResource Dcms.Ink}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" TabIndex="0" PreviewKeyUp="cboUserFullName_PreviewKeyUp" SelectedIndexChanged="cboUserFullName_SelectionChanged" AutomationProperties.Name="اسم المستخدم"/>
+                        </Grid>
+                    </Border>
+                    <TextBlock x:Name="UserError" Style="{StaticResource Client.ErrorText}" Tag="{Binding ElementName=cboUserFullName}"/>
+                    <TextBlock Text="كلمة المرور" Style="{StaticResource Client.Label}" Margin="0,24,0,8"/>
+                    <Grid IsKeyboardFocusWithinChanged="PasswordArea_FocusChanged">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="32"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="42"/>
+                        </Grid.ColumnDefinitions>
+
+                        <dxe:PasswordBoxEdit ShowError="False" ShowErrorToolTip="False" ShowPasswordButtonVisibility="None" ShowCapsLockWarningToolTip="False" Grid.Column="0" x:Name="txbPassword" Style="{StaticResource Client.Input}" PreviewKeyUp="txbPassword_PreviewKeyUp" IsKeyboardFocusWithinChanged="Password_FocusChanged" EditValueChanged="txbPassword_EditValueChanged" AutomationProperties.Name="كلمة المرور" Grid.ColumnSpan="3" Padding="42,6,36,6"/>
+                        <!-- يمتد إطار المحرر خلف القفل والعين، مع حجز مساحة للنص بين الأيقونتين. -->
+                        <icons:PackIconMaterial x:Name="PasswordLockIcon" Kind="LockOutline" Width="20" Height="20" Foreground="{StaticResource Client.Blue}" VerticalAlignment="Center" HorizontalAlignment="Center" IsHitTestVisible="False"/>
+                        <!-- تبديل ظهور كلمة المرور بنقرة، مع اسم يصف الإجراء المتاح. -->
+                        <ToggleButton x:Name="PasswordVisibilityButton"
+Grid.Column="2"
+Width="36"
+Height="34"
+Background="Transparent"
+BorderThickness="0"
+FocusVisualStyle="{x:Null}"
+Focusable="False"
+Foreground="{StaticResource Client.Blue}"
+Checked="PasswordVisibility_Changed"
+Unchecked="PasswordVisibility_Changed">
+
+                            <ToggleButton.Style>
+                                <Style TargetType="ToggleButton">
+
+                                    <Setter Property="ToolTip"
+      Value="إظهار كلمة المرور"/>
+
+                                    <Setter Property="AutomationProperties.Name"
+      Value="إظهار كلمة المرور"/>
+
+                                    <Setter Property="BorderThickness"
+      Value="0"/>
+
+                                    <Setter Property="Background"
+      Value="Transparent"/>
+
+                                    <Setter Property="FocusVisualStyle"
+      Value="{x:Null}"/>
+
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ToggleButton">
+                                                <Border Background="Transparent"
+                  BorderThickness="0">
+
+                                                    <ContentPresenter
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"/>
+
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+
+                                    <Setter Property="Content">
+                                        <Setter.Value>
+                                            <icons:PackIconMaterial
+          Kind="EyeOutline"
+          Width="19"
+          Height="19"/>
+                                        </Setter.Value>
+                                    </Setter>
+
+                                    <Style.Triggers>
+
+                                        <DataTrigger
+      Binding="{Binding Password, ElementName=txbPassword}"
+      Value="">
+                                            <Setter Property="IsEnabled" Value="False"/>
+                                        </DataTrigger>
+
+                                        <DataTrigger
+      Binding="{Binding Password, ElementName=txbPassword}"
+      Value="{x:Null}">
+                                            <Setter Property="IsEnabled" Value="False"/>
+                                        </DataTrigger>
+
+                                        <Trigger Property="IsChecked" Value="True">
+
+                                            <Setter Property="ToolTip"
+              Value="إخفاء كلمة المرور"/>
+
+                                            <Setter Property="AutomationProperties.Name"
+              Value="إخفاء كلمة المرور"/>
+
+                                            <Setter Property="Content">
+                                                <Setter.Value>
+                                                    <icons:PackIconMaterial
+                  Kind="EyeOffOutline"
+                  Width="19"
+                  Height="19"/>
+                                                </Setter.Value>
+                                            </Setter>
+
+                                        </Trigger>
+
+                                    </Style.Triggers>
+                                </Style>
+                            </ToggleButton.Style>
+                        </ToggleButton>
+                    </Grid>
+                    <TextBlock x:Name="PasswordError" Style="{StaticResource Client.ErrorText}" Tag="{Binding ElementName=txbPassword}"/>
+                    <!-- مساحة ثابتة للتنبيه كي لا يتحرك زر الدخول عند تبديل Caps Lock. -->
+                    <TextBlock x:Name="PasswordCapsLockWarning" Text="مفتاح Caps Lock مفعّل" Visibility="Hidden"
+                 Height="20" Padding="0,3,0,0" FontSize="12" Foreground="#805008"/>
+                    <dx:SimpleButton x:Name="BNEXT" Click="BNEXT_Click" TabIndex="3" Margin="0,8,0,0" Style="{StaticResource Dcms.PrimaryButton}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="تسجيل الدخول" VerticalAlignment="Center"/>
+                            <iconPacks:PackIconMaterial Kind="ArrowLeft" Width="19" Height="19" Margin="14,0,0,0" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </dx:SimpleButton>
+                    <dx:SimpleButton x:Name="out" Click="out_Click" TabIndex="4" Margin="0,12,0,0" Style="{StaticResource Dcms.SecondaryButton}" Content="إغلاق المنظومة"/>
+                </StackPanel>
+                <StackPanel Grid.Row="2">
+                    <TextBlock Text="صندوق الضمان الاجتماعي" FontSize="12" Foreground="{StaticResource Dcms.Muted}" HorizontalAlignment="Center"/>
+                    <TextBlock Text="3.0.0.0" FontSize="12" Foreground="#909CB3" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                </StackPanel>
+            </Grid>
+            <!-- خلفية معمارية متجهة بهوية المنظومة، موزعة فوق بطاقة التعريف دون مزاحمة النصوص. -->
+            <Border Grid.Column="1" CornerRadius="16,0,0,16" ClipToBounds="True"
+                    Background="{StaticResource Login.BrandBackground}" BorderBrush="#746C573A" BorderThickness="0,0,1,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid Grid.RowSpan="2" IsHitTestVisible="False" ClipToBounds="True">
+                        <Path Data="M0,600 L600,0 M0,740 L740,0 M0,880 L880,0" Stroke="#0B91AED4" StrokeThickness="1" />
+                        <Border VerticalAlignment="Bottom" Height="270">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                    <GradientStop Color="#00101E35" Offset="0" />
+                                    <GradientStop Color="#B3101E35" Offset="1" />
+                                </LinearGradientBrush>
+                            </Border.Background>
+                        </Border>
+                    </Grid>
+                    <Viewbox Grid.Row="0" Margin="24,26,24,8" Stretch="Uniform" StretchDirection="DownOnly"
+                             VerticalAlignment="Center" IsHitTestVisible="False" MaxHeight="310">
+                        <Canvas Width="650" Height="310">
+                            <!-- مخطط مبانٍ ومسارات خدمة، مع أدوات الصيانة في بطاقات عائمة. -->
+                            <Ellipse Canvas.Left="70" Canvas.Top="-65" Width="470" Height="470" Fill="#0A8FB6EF" Stroke="#255E82B6"/>
+                            <Ellipse Canvas.Left="110" Canvas.Top="-25" Width="390" Height="390" Stroke="#254D709F"/>
+                            <Path Data="M10,281 H640 M30,296 H590 M75,281 V135 L165,102 V281 M165,281 V72 H325 V281 M325,281 V162 H427 V281 M427,281 V120 H540 V281"
+                                          Stroke="#7194C4" StrokeThickness="2" Opacity="0.8"/>
+                            <Path Data="M185,92 H305 M185,121 H305 M185,150 H305 M185,179 H305 M185,208 H305 M185,237 H305 M95,152 H145 M95,179 H145 M95,207 H145 M95,235 H145 M345,184 H405 M345,211 H405 M345,238 H405 M448,143 H519 M448,171 H519 M448,199 H519 M448,227 H519 M230,281 V252 H263 V281"
+                                          Stroke="#557CA9" StrokeThickness="5" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                            <Path Data="M35,235 C110,235 94,36 226,36 C358,36 376,265 608,200" Stroke="#D6B66F" StrokeThickness="2" StrokeDashArray="4 6" Opacity="0.75"/>
+                            <Border Canvas.Left="116" Canvas.Top="29" Width="84" Height="84" Background="#F7F9FE" CornerRadius="22" BorderBrush="#C9D9EF" BorderThickness="1">
+                                <icons:PackIconMaterial Kind="WrenchOutline" Width="41" Height="41" Foreground="#314D7A" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <Border Canvas.Left="474" Canvas.Top="46" Width="64" Height="64" Background="#D6B66F" CornerRadius="18">
+                                <icons:PackIconMaterial Kind="ClipboardCheckOutline" Width="31" Height="31" Foreground="#172944" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <Border Canvas.Left="350" Canvas.Top="230" Width="58" Height="58" Background="#345781" CornerRadius="16" BorderBrush="#6387B5" BorderThickness="1">
+                                <icons:PackIconMaterial Kind="CogOutline" Width="29" Height="29" Foreground="#E2EBFA" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <Ellipse Canvas.Left="47" Canvas.Top="222" Width="10" Height="10" Fill="#D6B66F"/>
+                            <Ellipse Canvas.Left="592" Canvas.Top="193" Width="10" Height="10" Fill="#D6B66F"/>
+                            <Path Data="M565,74 H580 M572.5,66.5 V81.5 M65,74 H77 M71,68 V80" Stroke="#90ACD2" StrokeThickness="2"/>
+                        </Canvas>
+                    </Viewbox>
+                    <Viewbox Grid.Row="1" Margin="18,0,18,24" Stretch="Uniform" StretchDirection="DownOnly" VerticalAlignment="Bottom" Height="454">
+                        <StackPanel x:Name="LoginBranding" Width="552" HorizontalAlignment="Center" Height="432">
+                            <!-- سطح فاتح للشعار يحافظ على تباين تفاصيله فوق الخلفية الكحلية. -->
+                            <Image x:Name="LoginBrandLogo" Source="/Resources/SsfLogo-transparent.png"
+                                Width="191" Height="199" Stretch="Uniform"
+                                RenderOptions.BitmapScalingMode="HighQuality" />
+                            <TextBlock x:Name="LoginDepartmentTitle" Text="إدارة الشؤون الادارية والخدمات" FontSize="27" FontWeight="SemiBold" Foreground="{StaticResource Dcms.Gold}" TextAlignment="Center"/>
+                            <TextBlock x:Name="LoginSystemTitle" Text="منظومة الخدمات والصيانة" FontSize="34" FontWeight="Bold" Foreground="White" TextAlignment="Center" TextWrapping="Wrap" LineHeight="46" Margin="0,12,0,0"/>
+                            <TextBlock x:Name="LoginSystemDescription" FontSize="18" Foreground="#E0E8F6" TextAlignment="Center" TextWrapping="Wrap" LineHeight="29" Margin="0,15,0,0"><Run FlowDirection="RightToLeft" Language="ar-ly" Text="لادارة ومتابعة تكليفات الصيانة"/></TextBlock>
+                            <Border Width="58" Height="3" Background="{StaticResource Dcms.Gold}" CornerRadius="2" Margin="0,23,0,18"/>
+                            <TextBlock x:Name="LoginDesignCredit" Text="تصميم إدارة تقنية المعلومات والاتصالات" FontSize="28" Foreground="{StaticResource Dcms.Gold}" TextAlignment="Center" TextWrapping="Wrap" FontWeight="Bold"/>
+                        </StackPanel>
+                    </Viewbox>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</mah:MetroWindow>

@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>MaintenanceSetup</AssemblyName>
+    <Product>تثبيت منظومة الخدمات والصيانة</Product>
+    <Version>3.0.0</Version>
+    <ApplicationIcon>../../Maintenance_app/Resources/maintenance-crossed-tools.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="MahApps.Metro" Version="2.4.11" />
+    <PackageReference Include="DevExpress.Wpf.Core" Version="26.1.6" />
+    <PackageReference Include="DevExpress.Wpf.Themes.Win11Light" Version="26.1.6" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.1" />
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+    <Compile Include="../../Maintenance_app/dbContext/InstalledConnectionSettings.cs" Link="InstalledConnectionSettings.cs" />
+    <Compile Include="../../Maintenance_app/Dashboard/UiMessages.cs" Link="UiMessages.cs" />
+    <EmbeddedResource Include="Migrate.sql" LogicalName="Migrate.sql" />
+    <EmbeddedResource Include="$(ApplicationPayload)" LogicalName="Application.zip" Condition="'$(ApplicationPayload)' != ''" />
+    <Resource Include="../../Maintenance_app/Resources/maintenance-crossed-tools.ico" Link="Application.ico" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net10.0-windows</TargetFramework><UseWPF>true</UseWPF><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable><NuGetAudit>false</NuGetAudit></PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.6"/><PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.6"/>
+    <PackageReference Include="ReportViewerCore.WinForms" Version="15.1.33"/>
+    <Reference Include="Maintenance_app"><HintPath>$(ApplicationBin)\Maintenance_app.dll</HintPath></Reference>
+    <None Include="../../Maintenance_app/Reports/*.rdlc" Link="Reports/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest"/>
+  </ItemGroup>
+</Project>

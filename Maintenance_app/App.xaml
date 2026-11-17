@@ -1,0 +1,356 @@
+<Application x:Class="Maintenance_app.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Maintenance_app"
+             
+              xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+ xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+ xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+         
+         
+          xmlns:vm="clr-namespace:Maintenance_app.viewo_Model"
+          xmlns:conv="clr-namespace:Maintenance_app.converts"
+          xmlns:local1="clr-namespace:Maintenance_app.converts"
+          Startup="Application_Startup" ShutdownMode="OnExplicitShutdown">
+    
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!--<telerik:Windows8ResourceDictionary/>-->
+                <!-- MahApps.Metro resource dictionaries. Make sure that all file names are Case Sensitive! -->
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.ComboBox.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.ComboBox.xaml" />
+                <!-- Accent and AppTheme setting -->
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Themes/ToggleSwitch.xaml" />
+
+                <!--<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.TabControl.MetroAnimatedTabControl.xaml" />-->
+                <!--<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.Styles.TabControl.Animated.xaml" />-->
+                <!-- Theme setting -->
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.Shared.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Steel.xaml" />
+                <ResourceDictionary Source="Resources/ModernTheme.xaml" />
+                <ResourceDictionary Source="Resources/DcmsTheme.xaml" />
+                <ResourceDictionary Source="Resources/MaintenanceWorkspace.xaml"/>
+                <ResourceDictionary Source="Resources/MaintenanceFlyouts.xaml"/>
+                
+
+            </ResourceDictionary.MergedDictionaries>
+
+
+            <RadialGradientBrush x:Key="mycolor" >
+
+
+                <GradientStop Color="#FF324D82" Offset="0.002"/>
+                <GradientStop Color="#FF20375F" Offset="1"/>
+                <GradientStop Color="#FF3D5D94" Offset="0.175"/>
+
+            </RadialGradientBrush>
+            <SolidColorBrush x:Key="PrimaryColor" Color="#3559A0"/>
+            <SolidColorBrush  Color="black" x:Key="txtColor" />
+            <local1:BooleanOrConverter x:Key="BooleanOrConverter" />
+            <ControlTemplate x:Key="errorTemplateSilverlightStyle">
+                <StackPanel Orientation="Horizontal">
+                    <Border BorderThickness="2" BorderBrush="#FFdc000c" CornerRadius="0.7"
+               VerticalAlignment="Top" Margin="-2,0,0,0">
+                        <Grid>
+                            <Polygon x:Name="toolTipCorner"
+                        Grid.ZIndex="2"
+                        Margin="-1"
+                        Points="6,6 6,0 0,0"
+                        Fill="#FFdc000c"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        IsHitTestVisible="True"/>
+                            <Polyline Grid.ZIndex="3"
+                         Points="7,7 0,0" Margin="-1" HorizontalAlignment="Right"
+                         StrokeThickness="1.5"
+                         StrokeEndLineCap="Round"
+                         StrokeStartLineCap="Round"
+                         Stroke="White"
+                         VerticalAlignment="Top"
+                         IsHitTestVisible="True"/>
+                            <AdornedElementPlaceholder x:Name="adorner"/>
+                        </Grid>
+                    </Border>
+                    <Border x:Name="errorBorder" Background="#FFdc000c" Margin="1,0,0,0"
+               Opacity="0" CornerRadius="1.5"
+               IsHitTestVisible="False"
+               MinHeight="24" MaxWidth="267">
+                        <Border.Effect>
+                            <DropShadowEffect ShadowDepth="2.25"
+                                 Color="Black"
+                                 Opacity="0.4"
+                                 Direction="315"
+                                 BlurRadius="4"/>
+                        </Border.Effect>
+                        <TextBlock Text="{Binding ElementName=adorner,
+                                     Path=AdornedElement.(Validation.Errors)[0].ErrorContent}"
+                      Foreground="White" Margin="8,3,8,3" TextWrapping="Wrap" FontWeight="Bold" />
+                    </Border>
+                </StackPanel>
+                <ControlTemplate.Triggers>
+                    <DataTrigger Value="True">
+                        <DataTrigger.Binding>
+                            <MultiBinding Converter="{StaticResource BooleanOrConverter}">
+                                <Binding ElementName="adorner" Path="AdornedElement.IsKeyboardFocused" />
+                                <Binding ElementName="toolTipCorner" Path="IsMouseOver"/>
+                            </MultiBinding>
+                        </DataTrigger.Binding>
+                        <DataTrigger.EnterActions>
+                            <BeginStoryboard x:Name="fadeInStoryboard">
+                                <Storyboard>
+                                    <DoubleAnimation Duration="00:00:00.15"
+                                        Storyboard.TargetName="errorBorder"
+                                        Storyboard.TargetProperty="Opacity"
+                                        To="1"/>
+                                    <ThicknessAnimation Duration="00:00:00.15"
+                                           Storyboard.TargetName="errorBorder"
+                                           Storyboard.TargetProperty="Margin"
+                                           FillBehavior="HoldEnd"
+                                           From="1,0,0,0"
+                                           To="5,0,0,0">
+                                        <ThicknessAnimation.EasingFunction>
+                                            <BackEase EasingMode="EaseOut" Amplitude="2"/>
+                                        </ThicknessAnimation.EasingFunction>
+                                    </ThicknessAnimation>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </DataTrigger.EnterActions>
+                        <DataTrigger.ExitActions>
+                            <StopStoryboard BeginStoryboardName="fadeInStoryboard"/>
+                            <BeginStoryboard x:Name="fadeOutStoryBoard">
+                                <Storyboard>
+                                    <DoubleAnimation Duration="00:00:00"
+                                        Storyboard.TargetName="errorBorder"
+                                        Storyboard.TargetProperty="Opacity"
+                                        To="0"/>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </DataTrigger.ExitActions>
+                    </DataTrigger>
+                </ControlTemplate.Triggers>
+            </ControlTemplate>
+            <ControlTemplate x:Key="errorTemplateSilverlightStylex">
+                <StackPanel Orientation="Horizontal">
+                    <Border BorderThickness="2" BorderBrush="#FFdc000c" CornerRadius="0.7" VerticalAlignment="Top" Margin="-2,0,0,0">
+                        <Grid>
+                            <Polygon x:Name="toolTipCorner" Grid.ZIndex="2" Margin="-1" Points="6,6 6,0 0,0"  Fill="#FFdc000c"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Top"
+                            IsHitTestVisible="True"/>
+                            <Polyline Grid.ZIndex="3"
+                             Points="7,7 0,0" Margin="-1" HorizontalAlignment="Right"
+                             StrokeThickness="1.5"
+                             StrokeEndLineCap="Round"
+                             StrokeStartLineCap="Round"
+                             Stroke="White"
+                             VerticalAlignment="Top"
+                             IsHitTestVisible="True"/>
+                            <AdornedElementPlaceholder x:Name="adorner"/>
+                        </Grid>
+                    </Border>
+                    <Border x:Name="errorBorder" Background="#FFdc000c" Margin="1,0,0,0" Opacity="0" CornerRadius="1.5" IsHitTestVisible="False"
+                    MinHeight="24" MaxWidth="267">
+                        <Border.Effect>
+                            <DropShadowEffect ShadowDepth="2.25"
+                                 Color="Black"
+                                 Opacity="0.4"
+                                 Direction="315"
+                                 BlurRadius="4"/>
+                        </Border.Effect>
+                        <TextBlock Text="{Binding ElementName=adorner,
+                                     Path=AdornedElement.(Validation.Errors)[0].ErrorContent}"
+                      Foreground="White" Margin="8,3,8,3" TextWrapping="Wrap" FontWeight="Bold" />
+                    </Border>
+                </StackPanel>
+                <ControlTemplate.Triggers>
+                    <DataTrigger Value="True">
+                        <DataTrigger.Binding>
+                            <MultiBinding Converter="{StaticResource BooleanOrConverter}">
+                                <Binding ElementName="adorner" Path="AdornedElement.IsKeyboardFocused" />
+                                <Binding ElementName="toolTipCorner" Path="IsMouseOver"/>
+                            </MultiBinding>
+                        </DataTrigger.Binding>
+                        <DataTrigger.EnterActions>
+                            <BeginStoryboard x:Name="fadeInStoryboard">
+                                <Storyboard>
+                                    <DoubleAnimation Duration="00:00:00.15"
+                                        Storyboard.TargetName="errorBorder"
+                                        Storyboard.TargetProperty="Opacity"
+                                        To="1"/>
+                                    <ThicknessAnimation Duration="00:00:00.15"
+                                           Storyboard.TargetName="errorBorder"
+                                           Storyboard.TargetProperty="Margin"
+                                           FillBehavior="HoldEnd"
+                                           From="1,0,0,0"
+                                           To="5,0,0,0">
+                                        <ThicknessAnimation.EasingFunction>
+                                            <BackEase EasingMode="EaseOut" Amplitude="2"/>
+                                        </ThicknessAnimation.EasingFunction>
+                                    </ThicknessAnimation>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </DataTrigger.EnterActions>
+                        <DataTrigger.ExitActions>
+                            <StopStoryboard BeginStoryboardName="fadeInStoryboard"/>
+                            <BeginStoryboard x:Name="fadeOutStoryBoard">
+                                <Storyboard>
+                                    <DoubleAnimation Duration="00:00:00"
+                                        Storyboard.TargetName="errorBorder"
+                                        Storyboard.TargetProperty="Opacity"
+                                        To="0"/>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </DataTrigger.ExitActions>
+                    </DataTrigger>
+                </ControlTemplate.Triggers>
+            </ControlTemplate>
+
+            <ControlTemplate x:Key="errorTemplateSilverlightStyle3">
+                <StackPanel Orientation="Vertical">
+                    <Border BorderThickness="2" BorderBrush="#FFdc000c" CornerRadius="0.7" VerticalAlignment="Top" Margin="-2,0,0,0">
+                        <Grid>
+                            <Polygon x:Name="toolTipCorner" Grid.ZIndex="2" Margin="-1" Points="6,6 6,0 0,0" Fill="#FFdc000c" HorizontalAlignment="Right" VerticalAlignment="Top" IsHitTestVisible="True" />
+                            <Polyline Grid.ZIndex="3" Points="7,7 0,0" Margin="-1" HorizontalAlignment="Right" StrokeThickness="1.5" StrokeEndLineCap="Round" StrokeStartLineCap="Round" Stroke="White" VerticalAlignment="Top" IsHitTestVisible="True" />
+                            <AdornedElementPlaceholder x:Name="adorner" />
+                        </Grid>
+                    </Border>
+                    <Border x:Name="errorBorder" Background="#FFdc000c" Margin="1,0,0,0" Opacity="0" CornerRadius="1.5" IsHitTestVisible="False" MinHeight="24" MaxWidth="267">
+                        <Border.Effect>
+                            <DropShadowEffect ShadowDepth="2.25" Color="Black" Opacity="0.4" Direction="315" BlurRadius="4" />
+                        </Border.Effect>
+                        <TextBlock Text="{Binding ElementName=adorner,                               Path=AdornedElement.(Validation.Errors)[0].ErrorContent}" Foreground="White" Margin="8,3,8,3" TextWrapping="Wrap" FontWeight="Bold" />
+                    </Border>
+                </StackPanel>
+                <ControlTemplate.Triggers>
+                    <DataTrigger Value="True">
+                        <DataTrigger.Binding>
+                            <MultiBinding Converter="{StaticResource BooleanOrConverter}">
+                                <Binding ElementName="adorner" Path="AdornedElement.IsKeyboardFocusWithin" />
+                                <Binding ElementName="toolTipCorner" Path="IsMouseOver" />
+                            </MultiBinding>
+                        </DataTrigger.Binding>
+                        <DataTrigger.EnterActions>
+                            <BeginStoryboard x:Name="fadeInStoryboard">
+                                <Storyboard>
+                                    <DoubleAnimation Duration="00:00:00.15" Storyboard.TargetName="errorBorder" Storyboard.TargetProperty="Opacity" To="1" />
+                                    <ThicknessAnimation Duration="00:00:00.15" Storyboard.TargetName="errorBorder" Storyboard.TargetProperty="Margin" FillBehavior="HoldEnd" From="1,0,0,0" To="5,0,0,0">
+                                        <ThicknessAnimation.EasingFunction>
+                                            <BackEase EasingMode="EaseOut" Amplitude="2" />
+                                        </ThicknessAnimation.EasingFunction>
+                                    </ThicknessAnimation>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </DataTrigger.EnterActions>
+                        <DataTrigger.ExitActions>
+                            <StopStoryboard BeginStoryboardName="fadeInStoryboard" />
+                            <BeginStoryboard x:Name="fadeOutStoryBoard">
+                                <Storyboard>
+                                    <DoubleAnimation Duration="00:00:00" Storyboard.TargetName="errorBorder" Storyboard.TargetProperty="Opacity" To="0" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </DataTrigger.ExitActions>
+                    </DataTrigger>
+                </ControlTemplate.Triggers>
+            </ControlTemplate>
+            <ControlTemplate x:Key="errorTemplateSilverlightStyle7">
+                <StackPanel Orientation="Vertical">
+                    <Border BorderThickness="2" CornerRadius="0.7"
+               VerticalAlignment="Top" Margin="-2,0,0,0">
+                        <Grid>
+                            <Polygon x:Name="toolTipCorner"
+                        Grid.ZIndex="2"
+                        Margin="-1"
+                        Points="6,6 6,0 0,0"
+                        Fill="{StaticResource mycolor}"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        IsHitTestVisible="True"/>
+                            <Polyline Grid.ZIndex="3"
+                         Points="7,7 0,0" Margin="-1" HorizontalAlignment="Right"
+                         StrokeThickness="1.5"
+                         StrokeEndLineCap="Round"
+                         StrokeStartLineCap="Round"
+                         Stroke="White"
+                         VerticalAlignment="Top"
+                         IsHitTestVisible="True"/>
+                            <AdornedElementPlaceholder x:Name="adorner"/>
+                        </Grid>
+                    </Border>
+                    <Border x:Name="errorBorder" Background="{DynamicResource AccentColorBrush}" Margin="1,0,0,0"
+               Opacity="0" CornerRadius="1.5"
+               IsHitTestVisible="False"
+               MinHeight="24" MaxWidth="267">
+                        <Border.Effect>
+                            <DropShadowEffect ShadowDepth="2.25"
+                                 Color="Black"
+                                 Opacity="0.4"
+                                 Direction="315"
+                                 BlurRadius="4"/>
+                        </Border.Effect>
+                        <TextBlock Text="{Binding ElementName=adorner,
+                                     Path=AdornedElement.(Validation.Errors)[0].ErrorContent}"
+                      Foreground="{StaticResource mycolor}" Margin="8,3,8,3" TextWrapping="Wrap" FontWeight="Bold" FontSize="12"/>
+                    </Border>
+                </StackPanel>
+                <ControlTemplate.Triggers>
+                    <DataTrigger Value="True">
+                        <DataTrigger.Binding>
+                            <MultiBinding Converter="{StaticResource BooleanOrConverter}">
+                                <Binding ElementName="adorner" Path="AdornedElement.IsKeyboardFocused" />
+                                <Binding ElementName="toolTipCorner" Path="IsMouseOver"/>
+                            </MultiBinding>
+                        </DataTrigger.Binding>
+                        <DataTrigger.EnterActions>
+                            <BeginStoryboard x:Name="fadeInStoryboard">
+                                <Storyboard>
+                                    <DoubleAnimation Duration="00:00:00.15"
+                                        Storyboard.TargetName="errorBorder"
+                                        Storyboard.TargetProperty="Opacity"
+                                        To="1"/>
+                                    <ThicknessAnimation Duration="00:00:00.15"
+                                           Storyboard.TargetName="errorBorder"
+                                           Storyboard.TargetProperty="Margin"
+                                           FillBehavior="HoldEnd"
+                                           From="1,0,0,0"
+                                           To="5,0,0,0">
+                                        <ThicknessAnimation.EasingFunction>
+                                            <BackEase EasingMode="EaseOut" Amplitude="2"/>
+                                        </ThicknessAnimation.EasingFunction>
+                                    </ThicknessAnimation>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </DataTrigger.EnterActions>
+                        <DataTrigger.ExitActions>
+                            <StopStoryboard BeginStoryboardName="fadeInStoryboard"/>
+                            <BeginStoryboard x:Name="fadeOutStoryBoard">
+                                <Storyboard>
+                                    <DoubleAnimation Duration="00:00:00"
+                                        Storyboard.TargetName="errorBorder"
+                                        Storyboard.TargetProperty="Opacity"
+                                        To="0"/>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </DataTrigger.ExitActions>
+                    </DataTrigger>
+                </ControlTemplate.Triggers>
+            </ControlTemplate>
+            <!--<Style TargetType="{x:Type dxe:ComboBoxEdit}" BasedOn="{StaticResource errorTemplateSilverlightStyle}"/>-->
+
+
+            <SolidColorBrush  Color="Black" x:Key="txtColor2" />
+
+
+
+
+
+
+
+
+
+        </ResourceDictionary>
+    </Application.Resources>
+
+</Application>

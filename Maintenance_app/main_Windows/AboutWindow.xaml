@@ -1,0 +1,133 @@
+<mah:MetroWindow x:Class="Maintenance_app.main_Windows.AboutWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:icons="http://metro.mahapps.com/winfx/xaml/iconpacks"
+    xmlns:vm="clr-namespace:Maintenance_app.viewo_Model"
+    Title="حول النظام | الخدمات والصيانة" Width="1180" Height="800" MinWidth="720" MinHeight="560"
+    WindowState="Maximized" ResizeMode="CanResizeWithGrip" WindowStartupLocation="CenterOwner"
+    WindowStyle="None" ShowTitleBar="False" ShowCloseButton="False" ShowMinButton="False" ShowMaxRestoreButton="False" AllowsTransparency="False"
+    Background="#F6F7FB" GlowBrush="{x:Null}" NonActiveGlowBrush="{x:Null}" BorderThickness="0" FlowDirection="RightToLeft" FontFamily="Segoe UI"
+    dx:ThemeManager.ThemeName="Win11Light" vm:RoundedWindowFrame.Enabled="True"
+    UseLayoutRounding="True">
+    <mah:MetroWindow.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Maintenance_app;component/Resources/MaintenanceWorkspace.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <!-- بطاقات تعريفية بهوية الرئيسية، تتوزع تلقائيًا حسب عرض النافذة. -->
+            <Style x:Key="About.Feature" TargetType="Border">
+                <Setter Property="Width" Value="284" /><Setter Property="Padding" Value="16" />
+                <Setter Property="Margin" Value="7" /><Setter Property="Background" Value="{StaticResource Workspace.Surface}" />
+                <Setter Property="CornerRadius" Value="14" /><Setter Property="BorderThickness" Value="1" />
+                <Setter Property="BorderBrush" Value="{StaticResource Workspace.Line}" />
+            </Style>
+            <Style x:Key="About.Icon" TargetType="icons:PackIconMaterial">
+                <Setter Property="Width" Value="27" /><Setter Property="Height" Value="27" />
+                <Setter Property="Foreground" Value="{StaticResource Workspace.Primary}" />
+                <Setter Property="Margin" Value="0,0,0,10" />
+            </Style>
+            <Style x:Key="About.Caption" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="17" /><Setter Property="FontWeight" Value="SemiBold" />
+                <Setter Property="Foreground" Value="{StaticResource Workspace.Ink}" />
+                <Setter Property="Margin" Value="0,0,0,8" />
+            </Style>
+            <Style x:Key="About.Description" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="14" /><Setter Property="LineHeight" Value="24" />
+                <Setter Property="Foreground" Value="{StaticResource Workspace.Muted}" />
+                <Setter Property="TextWrapping" Value="Wrap" />
+            </Style>
+            <Style x:Key="About.Button" TargetType="dx:SimpleButton">
+                <Setter Property="Height" Value="36" /><Setter Property="MinWidth" Value="38" />
+                <Setter Property="Padding" Value="10,0" /><Setter Property="Margin" Value="3" />
+                <Setter Property="Background" Value="#244068" /><Setter Property="Foreground" Value="White" />
+                <Setter Property="BorderThickness" Value="0" />
+            </Style>
+        </ResourceDictionary>
+    </mah:MetroWindow.Resources>
+    <!-- الإطار الأصلي مع حواف RoundedWindowFrame يضمن رسم النافذة المملوكة عند التكبير. -->
+    <!-- الإطار المستدير يحتضن مساحة التعريف والمعلومات، والتمرير يحمي المحتوى عند التصغير. -->
+    <Border Margin="10" CornerRadius="20" Background="{StaticResource Workspace.Canvas}"
+            BorderBrush="{StaticResource Workspace.Line}" BorderThickness="1">
+        <DockPanel LastChildFill="True">
+            <Border DockPanel.Dock="Top" Background="{StaticResource Workspace.Header}" CornerRadius="19,19,0,0"
+                    Padding="20,12" MouseLeftButtonDown="Title_MouseLeftButtonDown">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <icons:PackIconMaterial Kind="InformationOutline" Foreground="#E9CB8D" Width="22" Height="22" Margin="0,0,10,0" />
+                        <TextBlock Text="حول النظام" Foreground="White" FontSize="18" FontWeight="SemiBold" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" FlowDirection="LeftToRight">
+                        <dx:SimpleButton Click="Minimize_Click" Style="{StaticResource About.Button}" ToolTip="تصغير" AutomationProperties.Name="تصغير"><icons:PackIconMaterial Kind="Minus" Width="17" Height="17" /></dx:SimpleButton>
+                        <dx:SimpleButton Click="Maximize_Click" Style="{StaticResource About.Button}" ToolTip="تكبير أو استعادة الحجم" AutomationProperties.Name="تكبير أو استعادة الحجم"><icons:PackIconMaterial Kind="WindowMaximize" Width="17" Height="17" /></dx:SimpleButton>
+                        <dx:SimpleButton Click="Close_Click" Style="{StaticResource About.Button}" Background="#6E394B" ToolTip="إغلاق" AutomationProperties.Name="إغلاق"><icons:PackIconMaterial Kind="Close" Width="18" Height="18" /></dx:SimpleButton>
+                    </StackPanel>
+                </Grid>
+            </Border>
+            <Border DockPanel.Dock="Bottom" BorderBrush="{StaticResource Workspace.Line}" BorderThickness="0,1,0,0" Padding="22,12">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                    <TextBlock Style="{StaticResource About.Description}" VerticalAlignment="Center" ><Run Text="صندوق الضمان الاجتماعي · "/><Run FlowDirection="RightToLeft" Language="ar-ly" Text="ادارة تقنية المعلومات والاتصالات"/></TextBlock>
+                    <dx:SimpleButton Grid.Column="1" Click="Close_Click" IsCancel="True" IsDefault="True"
+                                     Style="{StaticResource About.Button}" MinWidth="110" Background="{StaticResource Workspace.Primary}">
+                        <StackPanel Orientation="Horizontal"><icons:PackIconMaterial Kind="Check" Width="17" Height="17" Margin="0,0,8,0" /><TextBlock Text="إغلاق" /></StackPanel>
+                    </dx:SimpleButton>
+                </Grid>
+            </Border>
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <StackPanel Margin="24,20" MaxWidth="1000" VerticalAlignment="Center">
+                    <Border Background="{StaticResource Workspace.Feature}" CornerRadius="20" Padding="20">
+                        <Grid>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                            <StackPanel VerticalAlignment="Center" Margin="0,0,24,0">
+                                <TextBlock Text="صندوق الضمان الاجتماعي" Foreground="#E9CB8D" FontSize="18" Margin="0,0,0,12" />
+                                <TextBlock Text="منظومة الخدمات والصيانة" Foreground="White" FontSize="32" FontWeight="Bold" TextWrapping="Wrap" />
+                                <TextBlock Foreground="#DAE4F4" FontSize="17" Margin="0,12,0,18" ><Run FlowDirection="RightToLeft" Text="لادارة ومتابعة "/><Run FlowDirection="RightToLeft" Language="ar-ly" Text="طلبات و "/><Run FlowDirection="RightToLeft" Text="تكليفات الصيانة اليومية "/></TextBlock>
+                            </StackPanel>
+                            <Image Source="/Resources/SsfLogo-transparent.png" Width="126" Height="144 "
+                                Stretch="Uniform" AutomationProperties.Name="شعار صندوق الضمان الاجتماعي" Margin="840,10,-6,10" Grid.ColumnSpan="2" />
+
+                        </Grid>
+                    </Border>
+                    <TextBlock Text="عن المنظومة" Style="{StaticResource About.Caption}" FontSize="23" Margin="8,18,8,8" />
+                    <TextBlock
+                               Style="{StaticResource About.Description}" Margin="8,0,8,12" FontSize="16" ><Run FlowDirection="RightToLeft" Language="ar-ly" Text="تطبيق لادارة و "/><Run Text="تسجيل تكاليف الصيانة، ومتابعة الطلبات وحالات التنفيذ، وإعداد التقارير والإحصاءات لدعم أعمال الخدمات والصيانة."/></TextBlock>
+                    <WrapPanel HorizontalAlignment="Center">
+                        <Border Style="{StaticResource About.Feature}">
+                            <StackPanel>
+                                <icons:PackIconMaterial Kind="Tools" Style="{StaticResource About.Icon}" />
+                                <TextBlock Text="إدارة أعمال الصيانة" Style="{StaticResource About.Caption}" />
+                                <TextBlock Text="تكاليف الصيانة والفنيون والخدمات ومتابعة تقارير الإنهاء." Style="{StaticResource About.Description}" />
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource About.Feature}">
+                            <StackPanel>
+                                <icons:PackIconMaterial Kind="ChartBoxOutline" Style="{StaticResource About.Icon}" />
+                                <TextBlock Text="التقارير والإحصاءات" Style="{StaticResource About.Caption}" />
+                                <TextBlock Text="كشوف الصيانة والمؤشرات السنوية ومعاينة المستندات وطباعتها." Style="{StaticResource About.Description}" />
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource About.Feature}">
+                            <StackPanel>
+                                <icons:PackIconMaterial Kind="BellOutline" Style="{StaticResource About.Icon}" />
+                                <TextBlock Text="الطلبات والإشعارات" Style="{StaticResource About.Caption}" />
+                                <TextBlock Text="متابعة الطلبات والتنبيهات ومستجدات التنفيذ من مركز الإشعارات." Style="{StaticResource About.Description}" />
+                            </StackPanel>
+                        </Border>
+                    </WrapPanel>
+                    <Border Background="#E9EEF6" CornerRadius="14" Padding="14" Margin="7,10,7,0">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <icons:PackIconMaterial Kind="CodeBraces" Width="25" Height="25" Foreground="{StaticResource Workspace.Primary}" Margin="0,0,14,0" VerticalAlignment="Center" />
+                            <StackPanel>
+                                <TextBlock Text="التصميم والبرمجة" Style="{StaticResource About.Description}" />
+                                <TextBlock Style="{StaticResource About.Caption}" Margin="0,4,0,0" TextWrapping="Wrap" ><Run FlowDirection="RightToLeft" Language="ar-ly" Text="فرج عبدالعظيم عثمان العوامي"/></TextBlock>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </DockPanel>
+    </Border>
+</mah:MetroWindow>

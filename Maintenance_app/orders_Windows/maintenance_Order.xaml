@@ -1,0 +1,1263 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mah:MetroWindow x:Class="Maintenance_app.orders_Windows.maintenance_Order" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls" xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid" xmlns:icons="http://metro.mahapps.com/winfx/xaml/iconpacks" xmlns:vm="clr-namespace:Maintenance_app.viewo_Model" xmlns:orders="clr-namespace:Maintenance_app.orders_Windows" xmlns:converts="clr-namespace:Maintenance_app.converts" Title="تكليف الصيانة" Width="1920" Height="1080" MinWidth="1000" MinHeight="700" FlowDirection="RightToLeft" WindowStartupLocation="CenterOwner" WindowStyle="None" AllowsTransparency="False" Background="#F0F3F9" BorderThickness="0" ResizeMode="CanResize" Loaded="Order_Loaded" PreviewKeyDown="Order_PreviewKeyDown" WindowState="Maximized" FontFamily="Segoe UI" FontSize="14" dx:ThemeManager.ThemeName="Win11Light" FlyoutOverlayBrush="#90182948" ShowTitleBar="False" ShowCloseButton="False" ShowMinButton="False" ShowMaxRestoreButton="False">
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="0" ResizeBorderThickness="6" GlassFrameThickness="0" CornerRadius="12" UseAeroCaptionButtons="False" />
+    </WindowChrome.WindowChrome>
+    <mah:MetroWindow.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Maintenance_app;component/Resources/StaticChoices.xaml" />
+                <ResourceDictionary Source="/Maintenance_app;component/Resources/MaintenanceFlyouts.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <Style x:Key="Dmc.GridCellText"
+       TargetType="{x:Type dxe:TextEdit}">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="CornerRadius" Value="0"/>
+            </Style>
+
+            <DataTemplate x:Key="CustomHeaderTemplate">
+                <DockPanel x:Name="dpHeader" VerticalAlignment="Bottom" LastChildFill="True" Width="0" Height="0" Margin="-10,0,-22,-6" Visibility="Hidden">
+                    <Button x:Name="PART_BackButton" Command="{Binding InternalCloseCommand, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type mah:Flyout}}}" CommandParameter="{Binding CloseCommandParameter, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type mah:Flyout}}}" Width="50" Height="50" Margin="2 4 2 2" VerticalAlignment="Bottom" Style="{DynamicResource MahApps.Metro.Styles.MetroCircleButtonStyle}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type mah:Flyout}}}" FontFamily="Segoe UI Symbol" FontSize="16" DockPanel.Dock="Left" Background="{DynamicResource AccentColorBrush}" IsCancel="{Binding CloseButtonIsCancel, RelativeSource={RelativeSource AncestorType={x:Type mah:Flyout}, Mode=FindAncestor}}" Visibility="{Binding CloseButtonVisibility, RelativeSource={RelativeSource AncestorType={x:Type mah:Flyout}, Mode=FindAncestor}}" BorderBrush="#FF191616">
+                        <ContentControl Style="{DynamicResource PathIconContentControlStyle}" Content="M19,34V42H43.75L33.75,52H44.25L58.25,38L44.25,24H33.75L43.75,34H19Z" Width="20" Height="20" />
+                    </Button>
+                    <TextBlock x:Name="PART_BackHeaderText" Margin="0 0 15 0" TextAlignment="Right" VerticalAlignment="Center" Text="{Binding}" Visibility="{Binding TitleVisibility, RelativeSource={RelativeSource AncestorType={x:Type mah:Flyout}, Mode=FindAncestor}}" />
+                </DockPanel>
+                <DataTemplate.Triggers>
+                    <DataTrigger Binding="{Binding Position, RelativeSource={RelativeSource AncestorType={x:Type mah:Flyout}}}" Value="Left">
+                        <Setter TargetName="PART_BackHeaderText" Property="Margin" Value="15 0 0 0" />
+                        <Setter TargetName="PART_BackHeaderText" Property="TextAlignment" Value="Left" />
+                        <Setter TargetName="PART_BackButton" Property="DockPanel.Dock" Value="Left" />
+                        <Setter TargetName="PART_BackButton" Property="LayoutTransform">
+                            <Setter.Value>
+                                <ScaleTransform ScaleX="-1" />
+                            </Setter.Value>
+                        </Setter>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Position, RelativeSource={RelativeSource AncestorType={x:Type mah:Flyout}}}" Value="Top">
+                        <Setter TargetName="PART_BackButton" Property="LayoutTransform">
+                            <Setter.Value>
+                                <RotateTransform Angle="-90" />
+                            </Setter.Value>
+                        </Setter>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Position, RelativeSource={RelativeSource AncestorType={x:Type mah:Flyout}}}" Value="Bottom">
+                        <Setter TargetName="PART_BackButton" Property="LayoutTransform">
+                            <Setter.Value>
+                                <RotateTransform Angle="270" />
+                            </Setter.Value>
+                        </Setter>
+                    </DataTrigger>
+                </DataTemplate.Triggers>
+            </DataTemplate>
+            <DataTemplate x:Key="ButtonCellTemplate">
+                <!-- تمرير بيان الصف إلى حدث الحذف؛ سياق خلية DevExpress يحتوي السجل داخل RowData.Row. -->
+                <dx:SimpleButton Click="Service_Delete_click" Tag="{Binding RowData.Row}" IsEnabled="True" ToolTip="حذف بيان الصيانة" AutomationProperties.Name="حذف بيان الصيانة">
+                    <icons:PackIconMaterialDesign Foreground="Red" Kind="Delete" Height="22" Width="30" />
+                </dx:SimpleButton>
+            </DataTemplate>
+            <DataTemplate x:Key="ButtonCellTemplate2">
+                <!-- تمرير المادة نفسها إلى حدث حذف المواد بدل الاعتماد على الصف المحدد في الجدول. -->
+                <dx:SimpleButton Click="Parts_Delete_click" Tag="{Binding RowData.Row}" IsEnabled="True" ToolTip="حذف المادة" AutomationProperties.Name="حذف المادة">
+                    <icons:PackIconMaterialDesign Foreground="Red" Kind="Delete" Height="22" Width="30" />
+                </dx:SimpleButton>
+            </DataTemplate>
+            <!-- لون الخانة الممتلئة يحدده وجود EditValue، دون المساس بالقيمة أو قواعد حفظها. -->
+            <converts:InputHasValueConverter x:Key="Order.HasInputValue" />
+            <SolidColorBrush x:Key="Order.FilledFieldBackground" Color="#DDE6F4" />
+            <!-- حدود أوضح قليلًا في الحالات العادية والتحويم والامتلاء؛ يبقى لون التركيز الأقوى كما هو. -->
+            <SolidColorBrush x:Key="Order.FieldBorder" Color="#A7B6CD" />
+            <SolidColorBrush x:Key="Order.HoverFieldBorder" Color="#879DBC" />
+            <SolidColorBrush x:Key="Order.FilledFieldBorder" Color="#7C95BC" />
+            <converts:BooleanOrConverter x:Key="Order.ValidationVisible" />
+            <!-- تحقق الخانات بأسلوب DCMS؛ طبقة الزينة لا تغير مقاسات الخانة أو قيمة الإدخال. -->
+            <ControlTemplate x:Key="Order.FieldErrorTemplate">
+                <StackPanel Orientation="Vertical" FlowDirection="RightToLeft">
+                    <Border BorderThickness="2" BorderBrush="#DC000C" CornerRadius="8" VerticalAlignment="Top" Margin="-1">
+                        <Grid>
+                            <AdornedElementPlaceholder x:Name="adorner" />
+                            <Polygon x:Name="errorCorner" Grid.ZIndex="2" Points="8,8 8,0 0,0" Fill="#DC000C" HorizontalAlignment="Right" VerticalAlignment="Top" />
+                            <Polyline Grid.ZIndex="3" Points="7,7 0,0" HorizontalAlignment="Right" VerticalAlignment="Top" Stroke="White" StrokeThickness="1.5" IsHitTestVisible="False" />
+                        </Grid>
+                    </Border>
+                    <Border x:Name="errorMessage" Background="#DC000C" Opacity="0" CornerRadius="3" IsHitTestVisible="False" MinHeight="24" MaxWidth="300" HorizontalAlignment="Right">
+                        <TextBlock Text="{Binding ElementName=adorner, Path=AdornedElement.(Validation.Errors)[0].ErrorContent}" Foreground="White" Margin="8,3" TextWrapping="Wrap" FontWeight="SemiBold" />
+                    </Border>
+                </StackPanel>
+                <ControlTemplate.Triggers>
+                    <DataTrigger Value="True">
+                        <DataTrigger.Binding>
+                            <MultiBinding Converter="{StaticResource Order.ValidationVisible}">
+                                <Binding ElementName="adorner" Path="AdornedElement.IsKeyboardFocusWithin" />
+                                <Binding ElementName="errorCorner" Path="IsMouseOver" />
+                            </MultiBinding>
+                        </DataTrigger.Binding>
+                        <Setter TargetName="errorMessage" Property="Opacity" Value="1" />
+                    </DataTrigger>
+                </ControlTemplate.Triggers>
+            </ControlTemplate>
+            <SolidColorBrush x:Key="Order.Accent" Color="#3559A0" />
+            <Style x:Key="Order.ChromeIcon" TargetType="icons:PackIconMaterial">
+                <Setter Property="Width" Value="18" />
+                <Setter Property="Height" Value="18" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="HorizontalAlignment" Value="Center" />
+                <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type dx:SimpleButton}}}" />
+                <Setter Property="IsHitTestVisible" Value="False" />
+                <Setter Property="Focusable" Value="False" />
+            </Style>
+            <Style x:Key="FieldLabel" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="{DynamicResource Order.LabelFont}" />
+                <Setter Property="Foreground" Value="#4A5874" />
+                <Setter Property="Margin" Value="{DynamicResource Order.LabelGap}" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+            </Style>
+            <Style TargetType="dxe:ComboBoxEdit">
+                <EventSetter Event="SelectedIndexChanged" Handler="Input_SelectionChanged" />
+                <EventSetter Event="PopupContentSelectionChanged" Handler="Input_SelectionChanged" />
+                <!-- لا تحقق تلقائيًا أثناء الكتابة؛ الخطأ يوضع صراحة عند تنفيذ الأمر ويزال عند تعديل القيمة. -->
+                <Setter Property="ValidateOnTextInput" Value="False" />
+                <Setter Property="ValidateOnEnterKeyPressed" Value="False" />
+                <Setter Property="InvalidValueBehavior" Value="AllowLeaveEditor" />
+                <EventSetter Event="EditValueChanged" Handler="Input_EditValueChanged" />
+                <EventSetter Event="EditValueChanging" Handler="Input_EditValueChanging" />
+                <EventSetter Event="PreviewTextInput" Handler="Input_PreviewTextInput" />
+                <Setter Property="Height" Value="{DynamicResource Order.FieldHeight}" />
+                <Setter Property="FontSize" Value="{DynamicResource Order.FieldFont}" />
+                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="AutoComplete" Value="True" />
+                <Setter Property="IncrementalFiltering" Value="True" />
+                <Setter Property="IsTextEditable" Value="True" />
+                <Setter Property="NullText" Value="اختر من القائمة" />
+                <Setter Property="Background" Value="#FCFBF8" />
+                <Setter Property="Foreground" Value="#253A62" />
+                <Setter Property="BorderBrush" Value="{StaticResource Order.FieldBorder}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="BorderBrush" Value="{StaticResource Order.HoverFieldBorder}" />
+                        <Setter Property="Background" Value="#F4F6FB" />
+                    </Trigger>
+                    <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                        <Setter Property="BorderBrush" Value="#3559A0" />
+                        <Setter Property="Background" Value="White" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <Style TargetType="dxe:TextEdit">
+                <!-- لا تحقق تلقائيًا أثناء الكتابة؛ الخطأ يوضع صراحة عند تنفيذ الأمر ويزال عند تعديل القيمة. -->
+                <Setter Property="ValidateOnTextInput" Value="False" />
+                <Setter Property="ValidateOnEnterKeyPressed" Value="False" />
+                <Setter Property="InvalidValueBehavior" Value="AllowLeaveEditor" />
+                <EventSetter Event="EditValueChanged" Handler="Input_EditValueChanged" />
+                <EventSetter Event="EditValueChanging" Handler="Input_EditValueChanging" />
+                <EventSetter Event="PreviewTextInput" Handler="Input_PreviewTextInput" />
+                <Setter Property="Height" Value="{DynamicResource Order.FieldHeight}" />
+                <Setter Property="FontSize" Value="{DynamicResource Order.FieldFont}" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="Background" Value="#FCFBF8" />
+                <Setter Property="Foreground" Value="#253A62" />
+                <Setter Property="BorderBrush" Value="{StaticResource Order.FieldBorder}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="BorderBrush" Value="{StaticResource Order.HoverFieldBorder}" />
+                        <Setter Property="Background" Value="#F4F6FB" />
+                    </Trigger>
+                    <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                        <Setter Property="BorderBrush" Value="#3559A0" />
+                        <Setter Property="Background" Value="White" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <Style TargetType="dxe:SpinEdit">
+                <!-- لا تحقق تلقائيًا أثناء الكتابة؛ الخطأ يوضع صراحة عند تنفيذ الأمر ويزال عند تعديل القيمة. -->
+                <Setter Property="ValidateOnTextInput" Value="False" />
+                <Setter Property="ValidateOnEnterKeyPressed" Value="False" />
+                <Setter Property="InvalidValueBehavior" Value="AllowLeaveEditor" />
+                <EventSetter Event="EditValueChanged" Handler="Input_EditValueChanged" />
+                <EventSetter Event="EditValueChanging" Handler="Input_EditValueChanging" />
+                <EventSetter Event="PreviewTextInput" Handler="Input_PreviewTextInput" />
+                <Setter Property="Height" Value="{DynamicResource Order.FieldHeight}" />
+                <Setter Property="FontSize" Value="{DynamicResource Order.FieldFont}" />
+                <Setter Property="MinValue" Value="0" />
+                <Setter Property="Mask" Value="n3" />
+                <Setter Property="MaskUseAsDisplayFormat" Value="True" />
+                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="Background" Value="#FCFBF8" />
+                <Setter Property="Foreground" Value="#253A62" />
+                <Setter Property="BorderBrush" Value="{StaticResource Order.FieldBorder}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="BorderBrush" Value="{StaticResource Order.HoverFieldBorder}" />
+                        <Setter Property="Background" Value="#F4F6FB" />
+                    </Trigger>
+                    <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                        <Setter Property="BorderBrush" Value="#3559A0" />
+                        <Setter Property="Background" Value="White" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <Style TargetType="dxe:DateEdit">
+                <!-- لا تحقق تلقائيًا أثناء الكتابة؛ الخطأ يوضع صراحة عند تنفيذ الأمر ويزال عند تعديل القيمة. -->
+                <Setter Property="ValidateOnTextInput" Value="False" />
+                <Setter Property="ValidateOnEnterKeyPressed" Value="False" />
+                <Setter Property="InvalidValueBehavior" Value="AllowLeaveEditor" />
+                <EventSetter Event="EditValueChanged" Handler="Input_EditValueChanged" />
+                <EventSetter Event="EditValueChanging" Handler="Input_EditValueChanging" />
+                <EventSetter Event="PreviewTextInput" Handler="Input_PreviewTextInput" />
+                <Setter Property="Height" Value="{DynamicResource Order.FieldHeight}" />
+                <Setter Property="FontSize" Value="{DynamicResource Order.FieldFont}" />
+                <Setter Property="Mask" Value="dd/MM/yyyy" />
+                <Setter Property="MaskUseAsDisplayFormat" Value="True" />
+                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                <Setter Property="Background" Value="#FCFBF8" />
+                <Setter Property="Foreground" Value="#253A62" />
+                <Setter Property="BorderBrush" Value="{StaticResource Order.FieldBorder}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="BorderBrush" Value="{StaticResource Order.HoverFieldBorder}" />
+                        <Setter Property="Background" Value="#F4F6FB" />
+                    </Trigger>
+                    <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                        <Setter Property="BorderBrush" Value="#3559A0" />
+                        <Setter Property="Background" Value="White" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <Style x:Key="ActionButton" TargetType="dx:SimpleButton">
+                <Setter Property="Height" Value="{DynamicResource Order.FieldHeight}" />
+                <Setter Property="MinWidth" Value="92" />
+                <Setter Property="Margin" Value="4,0" />
+                <Setter Property="FontSize" Value="{DynamicResource Order.FieldFont}" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+                <Setter Property="Background" Value="#F4F6FB" />
+                <Setter Property="Foreground" Value="#24564B" />
+                <Setter Property="BorderBrush" Value="#CFD9EB" />
+            </Style>
+            <Style x:Key="AddButton" TargetType="dx:SimpleButton" BasedOn="{StaticResource ActionButton}">
+                <Setter Property="ContentTemplate">
+                    <Setter.Value>
+                        <DataTemplate>
+                            <icons:PackIconMaterial Kind="Plus" Style="{StaticResource Order.ChromeIcon}" />
+                        </DataTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="Width" Value="38" />
+                <Setter Property="MinWidth" Value="38" />
+                <Setter Property="Height" Value="{DynamicResource Order.FieldHeight}" />
+                <Setter Property="FontSize" Value="23" />
+                <Setter Property="Foreground" Value="{StaticResource Order.Accent}" />
+                <Setter Property="Background" Value="#EDF2FA" />
+            </Style>
+            <Style x:Key="ColumnHeader" TargetType="dxg:GridColumnHeader">
+                <Setter Property="Background" Value="{StaticResource Order.Accent}" />
+                <Setter Property="Foreground" Value="White" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                <Setter Property="FontSize" Value="{DynamicResource Order.LabelFont}" />
+                <Setter Property="MinHeight" Value="{DynamicResource Order.GridHeaderHeight}" />
+            </Style>
+            <Style x:Key="OrderView" TargetType="dxg:TableView">
+                <Setter Property="AutoWidth" Value="False" />
+                <Setter Property="ShowGroupPanel" Value="False" />
+                <Setter Property="AllowEditing" Value="False" />
+                <Setter Property="ShowIndicator" Value="False" />
+                <Setter Property="RowMinHeight" Value="{DynamicResource Order.GridRowHeight}" />
+                <Setter Property="ColumnHeaderStyle" Value="{StaticResource ColumnHeader}" />
+            </Style>
+            <LinearGradientBrush x:Key="Order.Hero" StartPoint="1,0" EndPoint="0,1">
+                <GradientStop Color="#182A50" Offset="0" />
+                <GradientStop Color="#324D82" Offset="0.68" />
+                <GradientStop Color="#456DB0" Offset="1" />
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="Order.Canvas" StartPoint="1,0" EndPoint="0,1">
+                <GradientStop Color="#F8F9FC" Offset="0" />
+                <GradientStop Color="#EDF0F6" Offset="1" />
+            </LinearGradientBrush>
+            <Style x:Key="Order.WindowButton" TargetType="dx:SimpleButton">
+                <Setter Property="Width" Value="38" />
+                <Setter Property="Height" Value="34" />
+                <Setter Property="Margin" Value="3,0" />
+                <Setter Property="Background" Value="#20FFFFFF" />
+                <Setter Property="Foreground" Value="White" />
+                <Setter Property="BorderBrush" Value="#30FFFFFF" />
+                <Setter Property="FontSize" Value="17" />
+            </Style>
+            <Style x:Key="Order.IconField" TargetType="Border">
+                <Setter Property="Background" Value="#FCFBF8" />
+                <Setter Property="BorderBrush" Value="{StaticResource Order.FieldBorder}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="CornerRadius" Value="8" />
+                <Setter Property="Validation.ErrorTemplate" Value="{StaticResource Order.FieldErrorTemplate}" />
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="BorderBrush" Value="{StaticResource Order.HoverFieldBorder}" />
+                    </Trigger>
+                    <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                        <Setter Property="BorderBrush" Value="#3559A0" />
+                        <Setter Property="Background" Value="White" />
+                    </Trigger>
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Opacity" Value="0.55" />
+                    </Trigger>
+                    <!-- Tag يقرأ قيمة المحرر، والتغميق يزول تلقائيًا عند مسحها. -->
+                    <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource Self}, Converter={StaticResource Order.HasInputValue}}" Value="True">
+                        <Setter Property="Background" Value="{StaticResource Order.FilledFieldBackground}" />
+                        <Setter Property="BorderBrush" Value="{StaticResource Order.FilledFieldBorder}" />
+                    </DataTrigger>
+                    <!-- الأحمر يتقدم على لون الامتلاء والتركيز عندما تكون قيمة الخانة غير صحيحة. -->
+                    <Trigger Property="Validation.HasError" Value="True">
+                        <Setter Property="BorderBrush" Value="#DC000C" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <Style x:Key="Order.FieldIconBadge" TargetType="Border">
+                <Setter Property="Background" Value="#EDF1FA" />
+                <Setter Property="CornerRadius" Value="6" />
+                <Setter Property="Width" Value="26" />
+                <Setter Property="Height" Value="26" />
+                <Setter Property="Margin" Value="3,0" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="IsHitTestVisible" Value="False" />
+                <Setter Property="Focusable" Value="False" />
+            </Style>
+            <Style x:Key="Order.FieldIcon" TargetType="icons:PackIconMaterial">
+                <Setter Property="Width" Value="17" />
+                <Setter Property="Height" Value="17" />
+                <Setter Property="Foreground" Value="{StaticResource Order.Accent}" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="HorizontalAlignment" Value="Center" />
+                <Setter Property="IsHitTestVisible" Value="False" />
+                <Setter Property="Focusable" Value="False" />
+            </Style>
+            <Style x:Key="Order.ButtonIcon" TargetType="icons:PackIconMaterial">
+                <Setter Property="Width" Value="17" />
+                <Setter Property="Height" Value="17" />
+                <Setter Property="Margin" Value="0,0,7,0" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type dx:SimpleButton}}}" />
+                <Setter Property="IsHitTestVisible" Value="False" />
+                <Setter Property="Focusable" Value="False" />
+            </Style>
+        </ResourceDictionary>
+
+    </mah:MetroWindow.Resources>
+    <mah:MetroWindow.Flyouts>
+        <mah:FlyoutsControl FlowDirection="RightToLeft" DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType={x:Type mah:MetroWindow}}}">
+            <!-- لوحة تعديل بيان الصيانة الجانبية؛ الفتح والإغلاق عبر IsOpen مع بقاء الربط والأحداث. -->
+            <mah:Flyout x:Name="Config_Service_Windows" Header="تعديل بيان الصيانة" Style="{StaticResource Maintenance.Flyout}" FocusedElement="{Binding ElementName=Text_dtils_Update}" IsOpenChanged="InternalFlyout_IsOpenChanged" Tag="PencilOutline">
+                <Border x:Name="Config_Service_WindowsCard" Style="{StaticResource Maintenance.Flyout.Card}" MaxWidth="850" VerticalAlignment="Center">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <orders:MaintenanceFlyoutHeader />
+
+                        <Grid Grid.Row="1" Margin="18">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="0" />
+                                <RowDefinition Height="84" />
+                                <RowDefinition Height="84" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="150" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Margin="0,0,10,0">
+                                    <TextBlock Style="{StaticResource FieldLabel}" Text="الإدارة أو القسم" />
+                                    <Border Style="{StaticResource Order.IconField}" Tag="{Binding EditValue, ElementName=Combo_Management_Update, Mode=OneWay}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="32" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Border Style="{StaticResource Order.FieldIconBadge}">
+                                                <icons:PackIconMaterial Kind="Domain" Style="{StaticResource Order.FieldIcon}" />
+                                            </Border>
+                                            <dxe:ComboBoxEdit x:Name="Combo_Management_Update" ItemsSource="{Binding Managements}" DisplayMember="Manag" Grid.Column="1" ShowBorder="False" BorderThickness="0" Background="Transparent" />
+                                        </Grid>
+                                    </Border>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Margin="0,0,10,0">
+                                    <TextBlock Style="{StaticResource FieldLabel}" Text="القسم أو الوحدة" />
+                                    <Border Style="{StaticResource Order.IconField}" Tag="{Binding EditValue, ElementName=Combo_Department_update, Mode=OneWay}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="32" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Border Style="{StaticResource Order.FieldIconBadge}">
+                                                <icons:PackIconMaterial Kind="SourceBranch" Style="{StaticResource Order.FieldIcon}" />
+                                            </Border>
+                                            <dxe:ComboBoxEdit x:Name="Combo_Department_update" ItemsSource="{Binding AllDepartments}" DisplayMember="Secti" Grid.Column="1" ShowBorder="False" BorderThickness="0" Background="Transparent" />
+                                        </Grid>
+                                    </Border>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Style="{StaticResource FieldLabel}" Text="الإجراء" />
+                                    <Border Style="{StaticResource Order.IconField}" Tag="{Binding EditValue, ElementName=Combo_Repier_type_Update, Mode=OneWay}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="32" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Border Style="{StaticResource Order.FieldIconBadge}">
+                                                <icons:PackIconMaterial Kind="Tools" Style="{StaticResource Order.FieldIcon}" />
+                                            </Border>
+                                            <dxe:ComboBoxEdit x:Name="Combo_Repier_type_Update" ItemTemplate="{StaticResource StaticChoice.Template}" ItemsSource="{Binding RepairActions}" IsTextEditable="False" Grid.Column="1" ShowBorder="False" BorderThickness="0" Background="Transparent" />
+                                        </Grid>
+                                    </Border>
+                                </StackPanel>
+                            </Grid>
+                            <StackPanel Grid.Row="2">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="تفاصيل الصيانة" />
+                                <Border Style="{StaticResource Order.IconField}" Tag="{Binding EditValue, ElementName=Text_dtils_Update, Mode=OneWay}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="32" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Style="{StaticResource Order.FieldIconBadge}">
+                                            <icons:PackIconMaterial Kind="TextBoxOutline" Style="{StaticResource Order.FieldIcon}" />
+                                        </Border>
+                                        <dxe:TextEdit x:Name="Text_dtils_Update" PreviewKeyUp="OriginalNavigation_KeyUp" Grid.Column="1" ShowBorder="False" BorderThickness="0" Background="Transparent" />
+                                    </Grid>
+                                </Border>
+                            </StackPanel>
+                            <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
+                                <dx:SimpleButton x:Name="Update_Button" Style="{StaticResource ActionButton}" Click="Update_Button_Click" Background="#3559A0" Foreground="White" BorderBrush="#3559A0" AutomationProperties.Name="حفظ التعديل">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <icons:PackIconMaterial Kind="ContentSaveOutline" Style="{StaticResource Order.ButtonIcon}" />
+                                        <TextBlock Text="حفظ التعديل" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </dx:SimpleButton>
+                                <dx:SimpleButton x:Name="But_Cancl_Update" Style="{StaticResource ActionButton}" Click="DismissOverlay_Click" AutomationProperties.Name="إلغاء">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <icons:PackIconMaterial Kind="Close" Style="{StaticResource Order.ButtonIcon}" />
+                                        <TextBlock Text="إلغاء" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </dx:SimpleButton>
+                            </StackPanel>
+                        </Grid>
+
+                    </Grid>
+                </Border>
+            </mah:Flyout>
+            <!-- لوحة تعديل المواد الجانبية؛ الفتح والإغلاق عبر IsOpen مع بقاء الربط والأحداث. -->
+            <mah:Flyout x:Name="Config_Parts_Windows" Header="تعديل المواد" Style="{StaticResource Maintenance.Flyout}" FocusedElement="{Binding ElementName=Text_Parts_Update}" IsOpenChanged="InternalFlyout_IsOpenChanged" Tag="PackageVariantClosed">
+                <Border x:Name="Config_Parts_WindowsCard" Style="{StaticResource Maintenance.Flyout.Card}" MaxWidth="650" VerticalAlignment="Center">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <orders:MaintenanceFlyoutHeader />
+
+                        <Grid Grid.Row="1" Margin="18">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="0" />
+                                <RowDefinition Height="84" />
+                                <RowDefinition Height="84" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <StackPanel Grid.Row="1">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="المادة أو القطعة" />
+                                <Border Style="{StaticResource Order.IconField}" Tag="{Binding EditValue, ElementName=Text_Parts_Update, Mode=OneWay}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="32" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Style="{StaticResource Order.FieldIconBadge}">
+                                            <icons:PackIconMaterial Kind="PackageVariantClosed" Style="{StaticResource Order.FieldIcon}" />
+                                        </Border>
+                                        <dxe:TextEdit x:Name="Text_Parts_Update" PreviewKeyUp="OriginalNavigation_KeyUp" Grid.Column="1" ShowBorder="False" BorderThickness="0" Background="Transparent" />
+                                    </Grid>
+                                </Border>
+                            </StackPanel>
+                            <Grid Grid.Row="2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Margin="0,0,10,0">
+                                    <TextBlock Style="{StaticResource FieldLabel}" Text="الكمية" />
+                                    <Border Style="{StaticResource Order.IconField}" Tag="{Binding EditValue, ElementName=Text_Quantity_Update, Mode=OneWay}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="32" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Border Style="{StaticResource Order.FieldIconBadge}">
+                                                <icons:PackIconMaterial Kind="Counter" Style="{StaticResource Order.FieldIcon}" />
+                                            </Border>
+                                            <dxe:SpinEdit x:Name="Text_Quantity_Update" PreviewKeyUp="OriginalNavigation_KeyUp" Grid.Column="1" ShowBorder="False" BorderThickness="0" Background="Transparent" />
+                                        </Grid>
+                                    </Border>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Margin="0,0,10,0">
+                                    <TextBlock Style="{StaticResource FieldLabel}" Text="الوحدة" />
+                                    <Border Style="{StaticResource Order.IconField}" Tag="{Binding EditValue, ElementName=Combo_Units_Update, Mode=OneWay}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="32" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Border Style="{StaticResource Order.FieldIconBadge}">
+                                                <icons:PackIconMaterial Kind="Ruler" Style="{StaticResource Order.FieldIcon}" />
+                                            </Border>
+                                            <dxe:ComboBoxEdit x:Name="Combo_Units_Update" ItemTemplate="{StaticResource StaticChoice.Template}" ItemsSource="{Binding Units}" IsTextEditable="False" PreviewKeyUp="OriginalNavigation_KeyUp" Grid.Column="1" ShowBorder="False" BorderThickness="0" Background="Transparent" />
+                                        </Grid>
+                                    </Border>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Style="{StaticResource FieldLabel}" Text="سعر الوحدة" />
+                                    <Border Style="{StaticResource Order.IconField}" Tag="{Binding EditValue, ElementName=Text_Value_Update, Mode=OneWay}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="32" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Border Style="{StaticResource Order.FieldIconBadge}">
+                                                <icons:PackIconMaterial Kind="CashMultiple" Style="{StaticResource Order.FieldIcon}" />
+                                            </Border>
+                                            <dxe:SpinEdit x:Name="Text_Value_Update" PreviewKeyUp="OriginalNavigation_KeyUp" Grid.Column="1" ShowBorder="False" BorderThickness="0" Background="Transparent" />
+                                        </Grid>
+                                    </Border>
+                                </StackPanel>
+                            </Grid>
+                            <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
+                                <dx:SimpleButton x:Name="Update_Parts_Button" Style="{StaticResource ActionButton}" Click="Update_Parts_Button_Click" Background="#3559A0" Foreground="White" BorderBrush="#3559A0" AutomationProperties.Name="حفظ التعديل">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <icons:PackIconMaterial Kind="ContentSaveOutline" Style="{StaticResource Order.ButtonIcon}" />
+                                        <TextBlock Text="حفظ التعديل" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </dx:SimpleButton>
+                                <dx:SimpleButton x:Name="But_Cancl_Part_Update" Style="{StaticResource ActionButton}" Click="DismissOverlay_Click" AutomationProperties.Name="إلغاء">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <icons:PackIconMaterial Kind="Close" Style="{StaticResource Order.ButtonIcon}" />
+                                        <TextBlock Text="إلغاء" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </dx:SimpleButton>
+                            </StackPanel>
+                        </Grid>
+
+                    </Grid>
+                </Border>
+            </mah:Flyout>
+            <!-- لوحة البحث عن تكليف صيانة الجانبية؛ الفتح والإغلاق عبر IsOpen مع بقاء الربط والأحداث. -->
+            <mah:Flyout x:Name="adv_searsh" HeaderTemplate="{StaticResource CustomHeaderTemplate}" Header="البحث عن تكليف صيانة" Style="{StaticResource Maintenance.Flyout}" FocusedElement="{Binding ElementName=from_date}" IsOpenChanged="InternalFlyout_IsOpenChanged" Tag="Magnify">
+                <Border x:Name="adv_searshCard" Style="{StaticResource Maintenance.Flyout.Card}" MaxWidth="1500">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <orders:MaintenanceFlyoutHeader />
+
+                        <Grid Grid.Row="1" Margin="18">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="0" />
+                                <RowDefinition Height="92" />
+                                <RowDefinition Height="50" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="30" />
+                            </Grid.RowDefinitions>
+
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="2*" />
+                                    <ColumnDefinition Width="1.5*" />
+                                    <ColumnDefinition Width="1.5*" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Margin="0,0,12,0">
+                                    <CheckBox x:Name="By_Main" Content="بحسب تاريخ التكليف" Margin="0,0,0,10" />
+                                    <Grid IsEnabled="{Binding IsChecked, ElementName=By_Main}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition />
+                                            <ColumnDefinition />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Style="{StaticResource Order.IconField}" Tag="{Binding EditValue, ElementName=from_date, Mode=OneWay}" Margin="0,0,6,0">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="32" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <Border Style="{StaticResource Order.FieldIconBadge}">
+                                                    <icons:PackIconMaterial Kind="CalendarMonthOutline" Style="{StaticResource Order.FieldIcon}" />
+                                                </Border>
+                                                <dxe:DateEdit x:Name="from_date" NullText="من تاريخ" Grid.Column="1" ShowBorder="False" BorderThickness="0" Background="Transparent" />
+                                            </Grid>
+                                        </Border>
+                                        <Border Style="{StaticResource Order.IconField}" Tag="{Binding EditValue, ElementName=To_date, Mode=OneWay}" Grid.Column="1">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="32" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <Border Style="{StaticResource Order.FieldIconBadge}">
+                                                    <icons:PackIconMaterial Kind="CalendarMonthOutline" Style="{StaticResource Order.FieldIcon}" />
+                                                </Border>
+                                                <dxe:DateEdit x:Name="To_date" NullText="إلى تاريخ" Grid.Column="1" ShowBorder="False" BorderThickness="0" Background="Transparent" />
+                                            </Grid>
+                                        </Border>
+                                    </Grid>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Margin="0,0,12,0">
+                                    <CheckBox x:Name="By_Emp" Content="بحسب الفنيين" Margin="0,0,0,10" />
+                                    <Border Style="{StaticResource Order.IconField}" Tag="{Binding EditValue, ElementName=Combo_emp_Search, Mode=OneWay}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="32" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Border Style="{StaticResource Order.FieldIconBadge}">
+                                                <icons:PackIconMaterial Kind="AccountGroupOutline" Style="{StaticResource Order.FieldIcon}" />
+                                            </Border>
+                                            <dxe:ComboBoxEdit x:Name="Combo_emp_Search" ItemsSource="{Binding SearchEmployees}" DisplayMember="Emp_Name" NullText="اختر الفني" IsEnabled="{Binding IsChecked, ElementName=By_Emp}" Grid.Column="1" ShowBorder="False" BorderThickness="0" Background="Transparent" />
+                                        </Grid>
+                                    </Border>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <CheckBox x:Name="By_Service" Content="بحسب نوع الخدمة" Margin="0,0,0,10" />
+                                    <Border Style="{StaticResource Order.IconField}" Tag="{Binding EditValue, ElementName=Combo_Services_Search, Mode=OneWay}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="32" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Border Style="{StaticResource Order.FieldIconBadge}">
+                                                <icons:PackIconMaterial Kind="Tools" Style="{StaticResource Order.FieldIcon}" />
+                                            </Border>
+                                            <dxe:ComboBoxEdit x:Name="Combo_Services_Search" ItemsSource="{Binding Services}" DisplayMember="Serv_type" NullText="اختر الخدمة" IsEnabled="{Binding IsChecked, ElementName=By_Service}" Grid.Column="1" ShowBorder="False" BorderThickness="0" Background="Transparent" />
+                                        </Grid>
+                                    </Border>
+                                </StackPanel>
+                            </Grid>
+                            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top">
+                                <dx:SimpleButton x:Name="Search_Advance_Button" Style="{StaticResource ActionButton}" Click="ExecuteSearch_Click" Background="#3559A0" Foreground="White" BorderBrush="#3559A0" AutomationProperties.Name="بحث">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <icons:PackIconMaterial Kind="Magnify" Style="{StaticResource Order.ButtonIcon}" />
+                                        <TextBlock Text="بحث" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </dx:SimpleButton>
+                                <dx:SimpleButton x:Name="Cancel_Search_Button" Style="{StaticResource ActionButton}" Click="DismissOverlay_Click" AutomationProperties.Name="إلغاء">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <icons:PackIconMaterial Kind="Close" Style="{StaticResource Order.ButtonIcon}" />
+                                        <TextBlock Text="إلغاء" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </dx:SimpleButton>
+                            </StackPanel>
+                            <orders:AccessibleOrderGrid Grid.Row="3" x:Name="Search_Grid" ItemsSource="{Binding SearchResults}" AutoGenerateColumns="None" MouseDoubleClick="SearchResult_DoubleClick" FontSize="{DynamicResource Order.FieldFont}" BorderBrush="#E3E8F0" Foreground="#3F506F">
+                                <dxg:GridControl.Columns>
+                                    <dxg:GridColumn FieldName="Number" HorizontalHeaderContentAlignment="Center" Header="رقم التكليف" Width="1.1*" MinWidth="90" >
+                                        <dxg:GridColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <dxe:TextEdit TextWrapping="WrapWithOverflow" x:Name="PART_Editor" HorizontalContentAlignment="Center" FontSize="14" Style="{StaticResource Dmc.GridCellText}" />
+                                            </DataTemplate>
+                                        </dxg:GridColumn.CellTemplate>
+                                    </dxg:GridColumn>
+                                    <dxg:GridColumn FieldName="Date" HorizontalHeaderContentAlignment="Center" Header="التاريخ" Width="1.2*" MinWidth="110">
+                                        <dxg:GridColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <!-- تطبيق قناع التاريخ على محرر الخلية نفسه لإخفاء الوقت أثناء العرض. -->
+                                                <dxe:TextEdit TextWrapping="WrapWithOverflow" x:Name="PART_Editor" HorizontalContentAlignment="Center" FontSize="14" Style="{StaticResource Dmc.GridCellText}" MaskType="DateTime" Mask="dd/MM/yyyy" MaskUseAsDisplayFormat="True" />
+                                            </DataTemplate>
+                                        </dxg:GridColumn.CellTemplate>
+                                        <dxg:GridColumn.EditSettings>
+                                            <dxe:TextEditSettings DisplayFormat="dd/MM/yyyy" />
+                                        </dxg:GridColumn.EditSettings>
+                                    </dxg:GridColumn>
+                                    <dxg:GridColumn HorizontalHeaderContentAlignment="Center" FieldName="Building" Header="المبنى" Width="2.2*" MinWidth="130" >
+                                        <dxg:GridColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <dxe:TextEdit TextWrapping="WrapWithOverflow" x:Name="PART_Editor" HorizontalContentAlignment="Center" FontSize="14" Style="{StaticResource Dmc.GridCellText}" />
+                                            </DataTemplate>
+                                        </dxg:GridColumn.CellTemplate>
+                                    </dxg:GridColumn>
+                                    <dxg:GridColumn HorizontalHeaderContentAlignment="Center" FieldName="Employees" Header="الفنيون" Width="2.3*" MinWidth="140" >
+                                        <dxg:GridColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <dxe:TextEdit TextWrapping="WrapWithOverflow" x:Name="PART_Editor" HorizontalContentAlignment="Center" FontSize="14" Style="{StaticResource Dmc.GridCellText}" />
+                                            </DataTemplate>
+                                        </dxg:GridColumn.CellTemplate>
+                                    </dxg:GridColumn>
+                                    <dxg:GridColumn HorizontalHeaderContentAlignment="Center" FieldName="Service" Header="الخدمات" Width="1.5*" MinWidth="110" >
+                                        <dxg:GridColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <dxe:TextEdit TextWrapping="WrapWithOverflow"  x:Name="PART_Editor" HorizontalContentAlignment="Center" FontSize="14" Style="{StaticResource Dmc.GridCellText}" />
+                                            </DataTemplate>
+                                        </dxg:GridColumn.CellTemplate>
+                                    </dxg:GridColumn>
+                                </dxg:GridControl.Columns>
+                                <dxg:GridControl.View>
+                                    <dxg:TableView Style="{StaticResource OrderView}" />
+                                </dxg:GridControl.View>
+                            </orders:AccessibleOrderGrid>
+                            <TextBlock Grid.Row="4" Text="{Binding SearchStatus}" VerticalAlignment="Center" Foreground="#6C83A7" />
+                            <dx:WaitIndicator x:Name="sfBusyIndicator" Grid.Row="3" DeferedVisibility="False" Content="جارٍ البحث…" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Grid>
+
+                    </Grid>
+                </Border>
+            </mah:Flyout>
+            <!-- لوحة الطباعة ومحتواها في التصميم؛ اتجاه الفتح والثيم الحاليان محفوظان. -->
+        </mah:FlyoutsControl>
+    </mah:MetroWindow.Flyouts>
+    <Border x:Name="mybo" CornerRadius="12" Background="{StaticResource Order.Hero}" BorderBrush="#CAD4E6" BorderThickness="1" vm:RoundedSurface.Radius="12" SizeChanged="OrderLayout_SizeChanged">
+        <Grid>
+            <Grid x:Name="OrderLayout" Margin="{DynamicResource Order.Gutter}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="{DynamicResource Order.HeroHeight}" />
+                    <RowDefinition Height="{DynamicResource Order.OverviewHeight}" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="{DynamicResource Order.FooterHeight}" />
+                </Grid.RowDefinitions>
+                <Border Background="{StaticResource Order.Hero}" CornerRadius="8" Margin="{DynamicResource Order.CardGap}" BorderBrush="#3E5277" BorderThickness="1" MouseLeftButtonDown="Title_MouseLeftButtonDown">
+                    <Grid Margin="16,0" FlowDirection="LeftToRight">
+                        <StackPanel x:Name="WindowActions" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
+                            <dx:SimpleButton x:Name="btnCancel" Style="{StaticResource Order.WindowButton}" Click="Close_Click" ToolTip="إغلاق" AutomationProperties.Name="إغلاق">
+                                <icons:PackIconMaterial Kind="WindowClose" Style="{StaticResource Order.ChromeIcon}" />
+                            </dx:SimpleButton>
+                            <dx:SimpleButton Style="{StaticResource Order.WindowButton}" Click="Maximize_Click" ToolTip="تكبير / استعادة" AutomationProperties.Name="تكبير / استعادة">
+                                <icons:PackIconMaterial Kind="WindowMaximize" Style="{StaticResource Order.ChromeIcon}" />
+                            </dx:SimpleButton>
+                            <dx:SimpleButton Style="{StaticResource Order.WindowButton}" Click="Minimize_Click" ToolTip="تصغير" AutomationProperties.Name="تصغير">
+                                <icons:PackIconMaterial Kind="WindowMinimize" Style="{StaticResource Order.ChromeIcon}" />
+                            </dx:SimpleButton>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" FlowDirection="RightToLeft">
+                            <Border Background="#24FFFFFF" CornerRadius="10" Padding="9" Margin="0,0,12,0">
+                                <icons:PackIconMaterial Kind="Tools" Width="26" Height="26" Foreground="#E8C987" />
+                            </Border>
+                            <StackPanel x:Name="OrderTitle" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding Title, RelativeSource={RelativeSource AncestorType={x:Type mah:MetroWindow}}}" Foreground="White" FontSize="23" FontWeight="SemiBold" />
+                                <TextBlock Text="منظومة الصيانة والخدمات" Foreground="#D4E1F5" FontSize="12" />
+                            </StackPanel>
+                            <Border Background="#25C7A052" BorderBrush="#75C7A052" BorderThickness="1" CornerRadius="8" Padding="12,5" Margin="22,0,0,0" VerticalAlignment="Center">
+                                <TextBlock Text="الخدمات والصيانة" Foreground="#F3DFB3" FontSize="12" />
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+                <Border x:Name="OrderOverviewCard" Grid.Row="1" Background="White" BorderBrush="#E0E5EE" BorderThickness="1" CornerRadius="8" Padding="{DynamicResource Order.CardPadding}" Margin="{DynamicResource Order.CardGap}">
+                    <Grid Margin="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1.05*" />
+                            <ColumnDefinition Width="1.8*" />
+                            <ColumnDefinition Width="1.2*" />
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="1.2*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Margin="0,0,10,0">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="رقم التكليف" />
+                            <Border Style="{StaticResource Order.IconField}" Tag="{Binding EditValue, ElementName=txt_maint_no, Mode=OneWay}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="32" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Border Style="{StaticResource Order.FieldIconBadge}">
+                                        <icons:PackIconMaterial Kind="Identifier" Style="{StaticResource Order.FieldIcon}" />
+                                    </Border>
+                                    <dxe:TextEdit x:Name="txt_maint_no" IsReadOnly="True" NullText="جديد" HorizontalContentAlignment="Center" Grid.Column="1" ShowBorder="False" BorderThickness="0" Background="Transparent" />
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="0,0,10,0">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="المبنى" />
+                            <DockPanel>
+                                <dx:SimpleButton x:Name="Add_Buildings" Style="{StaticResource AddButton}" DockPanel.Dock="Left" Click="LookupAdd_Click" Tag="Buildings" ToolTip="إضافة مبنى" />
+                                <Border Style="{StaticResource Order.IconField}" Tag="{Binding EditValue, ElementName=Combo_Buildings, Mode=OneWay}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="32" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Style="{StaticResource Order.FieldIconBadge}">
+                                            <icons:PackIconMaterial Kind="OfficeBuildingOutline" Style="{StaticResource Order.FieldIcon}" />
+                                        </Border>
+                                        <dxe:ComboBoxEdit x:Name="Combo_Buildings" ItemsSource="{Binding Buildings}" DisplayMember="Build" PreviewKeyUp="OriginalNavigation_KeyUp" Grid.Column="1" ShowBorder="False" BorderThickness="0" Background="Transparent" />
+                                    </Grid>
+                                </Border>
+                            </DockPanel>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Margin="0,0,10,0">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="التاريخ" />
+                            <Border Style="{StaticResource Order.IconField}" Tag="{Binding EditValue, ElementName=date_check, Mode=OneWay}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="32" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Border Style="{StaticResource Order.FieldIconBadge}">
+                                        <icons:PackIconMaterial Kind="CalendarMonthOutline" Style="{StaticResource Order.FieldIcon}" />
+                                    </Border>
+                                    <dxe:DateEdit x:Name="date_check" PreviewKeyUp="OriginalNavigation_KeyUp" Grid.Column="1" ShowBorder="False" BorderThickness="0" Background="Transparent" />
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+                        <StackPanel Grid.Column="3" Margin="0,0,10,0">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="الفاحص" />
+                            <Border Style="{StaticResource Order.IconField}" Tag="{Binding EditValue, ElementName=Combo_Check_Man, Mode=OneWay}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="32" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Border Style="{StaticResource Order.FieldIconBadge}">
+                                        <icons:PackIconMaterial Kind="AccountCheckOutline" Style="{StaticResource Order.FieldIcon}" />
+                                    </Border>
+                                    <dxe:ComboBoxEdit x:Name="Combo_Check_Man" ItemsSource="{Binding Employees}" DisplayMember="Emp_Name" PreviewKeyUp="OriginalNavigation_KeyUp" Grid.Column="1" ShowBorder="False" BorderThickness="0" Background="Transparent" />
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+                        <StackPanel Grid.Column="4">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="نوع التكليف" />
+                            <Border Style="{StaticResource Order.IconField}" Tag="{Binding EditValue, ElementName=Doc_Type, Mode=OneWay}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="32" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Border Style="{StaticResource Order.FieldIconBadge}">
+                                        <icons:PackIconMaterial Kind="ClipboardTextOutline" Style="{StaticResource Order.FieldIcon}" />
+                                    </Border>
+                                    <dxe:ComboBoxEdit x:Name="Doc_Type" ItemTemplate="{StaticResource StaticChoice.Template}" ItemsSource="{Binding DocumentTypes}" IsTextEditable="False" PreviewKeyUp="OriginalNavigation_KeyUp" Grid.Column="1" ShowBorder="False" BorderThickness="0" Background="Transparent" />
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+                        <StackPanel Grid.Row="1" Grid.ColumnSpan="4" Margin="0,0,10,0">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="الفنيون" />
+                            <Border Style="{StaticResource Order.IconField}" Tag="{Binding EditValue, ElementName=Combo_Technical_Man, Mode=OneWay}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="32" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Border Style="{StaticResource Order.FieldIconBadge}">
+                                        <icons:PackIconMaterial Kind="AccountGroupOutline" Style="{StaticResource Order.FieldIcon}" />
+                                    </Border>
+                                    <dxe:ComboBoxEdit x:Name="Combo_Technical_Man" HorizontalContentAlignment="Left" FlowDirection="LeftToRight" PopupOpened="TechnicianPopup_Opened" PopupClosed="TechnicianPopup_Closed" ItemsSource="{Binding Employees}" DisplayMember="Emp_Name" ValueMember="Employe_ID" NullText="اختر الفنيين" PopupFooterButtons="None" ClosePopupOnClickMode="Normal" VerticalScrollBarVisibility="Auto" AllowDefaultButton="True" PreviewKeyUp="OriginalNavigation_KeyUp" Grid.Column="1" ShowBorder="False" BorderThickness="0" Background="Transparent">
+                                        <dxe:ComboBoxEdit.StyleSettings>
+                                            <dxe:CheckedTokenComboBoxStyleSettings EnableTokenWrapping="False"  ShowTokenButtons="True" NewTokenText="اختر الفنيين" />
+                                        </dxe:ComboBoxEdit.StyleSettings>
+                                    </dxe:ComboBoxEdit>
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+                        <StackPanel Grid.Row="1" Grid.Column="4">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="نوع الخدمة" />
+                            <Border Style="{StaticResource Order.IconField}" Tag="{Binding EditValue, ElementName=Combo_Services, Mode=OneWay}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="32" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Border Style="{StaticResource Order.FieldIconBadge}">
+                                        <icons:PackIconMaterial Kind="Tools" Style="{StaticResource Order.FieldIcon}" />
+                                    </Border>
+                                    <dxe:ComboBoxEdit x:Name="Combo_Services" ItemsSource="{Binding Services}" DisplayMember="Serv_type" PreviewKeyUp="OriginalNavigation_KeyUp" Grid.Column="1" ShowBorder="False" BorderThickness="0" Background="Transparent" />
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+                <Border x:Name="RepairPanel" Grid.Row="2" Background="White" BorderBrush="#E0E5EE" BorderThickness="1" CornerRadius="8" Padding="{DynamicResource Order.CardPadding}" Margin="{DynamicResource Order.CardGap}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="{DynamicResource Order.SectionHeaderHeight}" />
+                            <RowDefinition Height="{DynamicResource Order.InputRowHeight}" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Border Background="#EDF2FA" CornerRadius="8" Padding="7" Margin="0,0,10,0">
+                                    <icons:PackIconMaterial Kind="ClipboardTextOutline" Foreground="#3559A0" Width="19" Height="19" />
+                                </Border>
+                                <TextBlock Text="بيان الصيانة" FontWeight="SemiBold" FontSize="17" Foreground="#172747" VerticalAlignment="Center" />
+                                <TextBlock Text="تفاصيل الأعمال والإجراءات" FontSize="12" Foreground="#72867E" Margin="14,0,0,0" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Grid>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1.25*" />
+                                <ColumnDefinition Width="1.25*" />
+                                <ColumnDefinition Width="0.75*" />
+                                <ColumnDefinition Width="2.4*" />
+                                <ColumnDefinition Width="160" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Margin="0,0,10,0">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="الإدارة أو القسم" />
+                                <DockPanel>
+                                    <dx:SimpleButton x:Name="Add_Mang" Style="{StaticResource AddButton}" DockPanel.Dock="Left" Click="LookupAdd_Click" Tag="Managements" ToolTip="إضافة إدارة" />
+                                    <Border Style="{StaticResource Order.IconField}" Tag="{Binding EditValue, ElementName=Combo_Management, Mode=OneWay}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="32" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Border Style="{StaticResource Order.FieldIconBadge}">
+                                                <icons:PackIconMaterial Kind="Domain" Style="{StaticResource Order.FieldIcon}" />
+                                            </Border>
+                                            <dxe:ComboBoxEdit x:Name="Combo_Management" ItemsSource="{Binding Managements}" DisplayMember="Manag" EditValueChanged="Management_Changed" PreviewKeyUp="OriginalNavigation_KeyUp" Grid.Column="1" ShowBorder="False" BorderThickness="0" Background="Transparent" />
+                                        </Grid>
+                                    </Border>
+                                </DockPanel>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Margin="0,0,10,0">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="القسم أو الوحدة" />
+                                <DockPanel>
+                                    <dx:SimpleButton x:Name="Add_Section" Style="{StaticResource AddButton}" DockPanel.Dock="Left" Click="LookupAdd_Click" Tag="Departments" ToolTip="إضافة قسم" />
+                                    <Border Style="{StaticResource Order.IconField}" Tag="{Binding EditValue, ElementName=Combo_Department, Mode=OneWay}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="32" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Border Style="{StaticResource Order.FieldIconBadge}">
+                                                <icons:PackIconMaterial Kind="SourceBranch" Style="{StaticResource Order.FieldIcon}" />
+                                            </Border>
+                                            <dxe:ComboBoxEdit x:Name="Combo_Department" ItemsSource="{Binding Departments}" DisplayMember="Secti" PreviewKeyUp="OriginalNavigation_KeyUp" Grid.Column="1" ShowBorder="False" BorderThickness="0" Background="Transparent" />
+                                        </Grid>
+                                    </Border>
+                                </DockPanel>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="الإجراء" />
+                                <Border Style="{StaticResource Order.IconField}" Tag="{Binding EditValue, ElementName=Combo_Repier_type, Mode=OneWay}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="32" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Style="{StaticResource Order.FieldIconBadge}">
+                                            <icons:PackIconMaterial Kind="Tools" Style="{StaticResource Order.FieldIcon}" />
+                                        </Border>
+                                        <dxe:ComboBoxEdit x:Name="Combo_Repier_type" ItemTemplate="{StaticResource StaticChoice.Template}" ItemsSource="{Binding RepairActions}" IsTextEditable="False" PreviewKeyUp="OriginalNavigation_KeyUp" Grid.Column="1" ShowBorder="False" BorderThickness="0" Background="Transparent" />
+                                    </Grid>
+                                </Border>
+                            </StackPanel>
+                            <!-- يبقى حقل التفاصيل داخل عموده كي لا يغطي زر الإضافة عند تضييق النافذة. -->
+                            <!-- هامش جهة الإجراء يفصل الحقل بصريًا عنه في التخطيط العربي. -->
+                            <StackPanel Grid.Column="3" Margin="18,0,10,0">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="تفاصيل الصيانة" />
+                                <Border Style="{StaticResource Order.IconField}" Tag="{Binding EditValue, ElementName=Text_dtils, Mode=OneWay}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="32" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Style="{StaticResource Order.FieldIconBadge}">
+                                            <icons:PackIconMaterial Kind="TextBoxOutline" Style="{StaticResource Order.FieldIcon}" />
+                                        </Border>
+                                        <dxe:TextEdit x:Name="Text_dtils" NullText="أدخل تفاصيل الصيانة" PreviewKeyUp="OriginalNavigation_KeyUp" Grid.Column="1" ShowBorder="False" BorderThickness="0" Background="Transparent" />
+                                    </Grid>
+                                </Border>
+                            </StackPanel>
+                            <StackPanel Grid.Column="4">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text=" " />
+                                <dx:SimpleButton x:Name="Add_ToList" Style="{StaticResource ActionButton}" Margin="0" Click="Add_ToList_Click" Height="{DynamicResource Order.FieldHeight}" Background="#3559A0" Foreground="White" BorderBrush="#3559A0" AutomationProperties.Name="إضافة للبيان">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <icons:PackIconMaterial Kind="Plus" Style="{StaticResource Order.ButtonIcon}" />
+                                        <TextBlock Text="إضافة للبيان" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </dx:SimpleButton>
+                            </StackPanel>
+                        </Grid>
+                        <orders:AccessibleOrderGrid Grid.Row="2" x:Name="Repiers_Grid" ItemsSource="{Binding Repairs}" AutoGenerateColumns="None" SelectionMode="MultipleRow" MouseDoubleClick="Repair_DoubleClick" FontSize="{DynamicResource Order.FieldFont}" BorderBrush="#E3E8F0" Foreground="#3F506F">
+                            <dxg:GridControl.Columns>
+                                <dxg:GridColumn Header="حذف" CellTemplate="{StaticResource ButtonCellTemplate}" Width="54" HorizontalHeaderContentAlignment="Center" FixedWidth="True" AllowSorting="False" AllowColumnFiltering="False">
+
+                                </dxg:GridColumn>
+                                <dxg:GridColumn HorizontalHeaderContentAlignment="Center" FieldName="Action" Header="الإجراء" Width="0.5*" MinWidth="75" >
+                                    <dxg:GridColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <dxe:TextEdit x:Name="PART_Editor" HorizontalContentAlignment="Center" FontSize="14" Style="{StaticResource Dmc.GridCellText}" />
+                                        </DataTemplate>
+                                    </dxg:GridColumn.CellTemplate>
+                                </dxg:GridColumn>
+                                <dxg:GridColumn HorizontalHeaderContentAlignment="Center" FieldName="Details" Header="التفاصيل" Width="3.4*" MinWidth="180" >
+                                    <dxg:GridColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <dxe:TextEdit TextWrapping="WrapWithOverflow" x:Name="PART_Editor" HorizontalContentAlignment="Center" FontSize="14" Style="{StaticResource Dmc.GridCellText}" />
+                                        </DataTemplate>
+                                    </dxg:GridColumn.CellTemplate>
+                                </dxg:GridColumn>
+                                <dxg:GridColumn HorizontalHeaderContentAlignment="Center" FieldName="Service" Header="نوع الصيانة" Width="1.4*" MinWidth="100" >
+                                    <dxg:GridColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <dxe:TextEdit TextWrapping="WrapWithOverflow" x:Name="PART_Editor" HorizontalContentAlignment="Center" FontSize="14" Style="{StaticResource Dmc.GridCellText}" />
+                                        </DataTemplate>
+                                    </dxg:GridColumn.CellTemplate>
+                                </dxg:GridColumn>
+                                <dxg:GridColumn HorizontalHeaderContentAlignment="Center" FieldName="Management" Header="الإدارة أو القسم" Width="1.6*" MinWidth="100" >
+                                    <dxg:GridColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <dxe:TextEdit TextWrapping="WrapWithOverflow" x:Name="PART_Editor" HorizontalContentAlignment="Center" FontSize="14" Style="{StaticResource Dmc.GridCellText}" />
+                                        </DataTemplate>
+                                    </dxg:GridColumn.CellTemplate>
+                                </dxg:GridColumn>
+                                <dxg:GridColumn HorizontalHeaderContentAlignment="Center" FieldName="Department" Header="القسم أو الوحدة" Width="1.6*" MinWidth="100" >
+                                    <dxg:GridColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <dxe:TextEdit TextWrapping="WrapWithOverflow" x:Name="PART_Editor" HorizontalContentAlignment="Center" FontSize="14" Style="{StaticResource Dmc.GridCellText}" />
+                                        </DataTemplate>
+                                    </dxg:GridColumn.CellTemplate>
+                                </dxg:GridColumn>
+                            </dxg:GridControl.Columns>
+                            <dxg:GridControl.View>
+                                <dxg:TableView Style="{StaticResource OrderView}" />
+                            </dxg:GridControl.View>
+                        </orders:AccessibleOrderGrid>
+                    </Grid>
+                </Border>
+                <Border x:Name="MaterialsPanel" Grid.Row="3" Background="White" BorderBrush="#E0E5EE" BorderThickness="1" CornerRadius="8" Padding="{DynamicResource Order.CardPadding}" Margin="{DynamicResource Order.CardGap}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="{DynamicResource Order.SectionHeaderHeight}" />
+                            <RowDefinition Height="{DynamicResource Order.InputRowHeight}" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0" FlowDirection="LeftToRight">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" FlowDirection="RightToLeft">
+                                <Border Background="#EDF2FA" CornerRadius="8" Padding="7" Margin="0,0,10,0">
+                                    <icons:PackIconMaterial Kind="PackageVariantClosed" Foreground="#3559A0" Width="19" Height="19" />
+                                </Border>
+                                <TextBlock Text="المواد والتكاليف" FontWeight="SemiBold" FontSize="17" Foreground="#172747" VerticalAlignment="Center" />
+                                <TextBlock Text="الأصناف والكميات وأسعار الوحدات" FontSize="12" Foreground="#72867E" Margin="14,0,0,0" VerticalAlignment="Center" />
+                            </StackPanel>
+                            <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" FlowDirection="RightToLeft">
+                                <TextBlock Text="إجمالي المواد" VerticalAlignment="Center" FontSize="13" FontWeight="SemiBold" Margin="0,0,12,0" Foreground="#7A622E" />
+                                <Border Style="{StaticResource Order.IconField}" Tag="{Binding EditValue, ElementName=Total_Part, Mode=OneWay}" Width="160">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="32" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Style="{StaticResource Order.FieldIconBadge}">
+                                            <icons:PackIconMaterial Kind="Sigma" Style="{StaticResource Order.FieldIcon}" />
+                                        </Border>
+                                        <dxe:SpinEdit x:Name="Total_Part" EditValue="{Binding TotalParts, Mode=OneWay}" IsReadOnly="True" AllowDefaultButton="False" Background="Transparent" Height="32" BorderBrush="#C7A052" FontSize="16" Grid.Column="1" ShowBorder="False" BorderThickness="0" />
+                                    </Grid>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2.8*" />
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="136" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Margin="0,0,10,0">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="المواد" />
+                                <Border Style="{StaticResource Order.IconField}" Tag="{Binding EditValue, ElementName=Text_Parts, Mode=OneWay}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="32" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Style="{StaticResource Order.FieldIconBadge}">
+                                            <icons:PackIconMaterial Kind="PackageVariantClosed" Style="{StaticResource Order.FieldIcon}" />
+                                        </Border>
+                                        <dxe:TextEdit x:Name="Text_Parts" NullText="اسم المادة أو القطعة" PreviewKeyUp="OriginalNavigation_KeyUp" Grid.Column="1" ShowBorder="False" BorderThickness="0" Background="Transparent" />
+                                    </Grid>
+                                </Border>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Margin="0,0,10,0">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="الكمية" />
+                                <Border Style="{StaticResource Order.IconField}" Tag="{Binding EditValue, ElementName=Text_Quantity, Mode=OneWay}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="32" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Style="{StaticResource Order.FieldIconBadge}">
+                                            <icons:PackIconMaterial Kind="Counter" Style="{StaticResource Order.FieldIcon}" />
+                                        </Border>
+                                        <dxe:SpinEdit x:Name="Text_Quantity" PreviewKeyUp="OriginalNavigation_KeyUp" Grid.Column="1" ShowBorder="False" BorderThickness="0" Background="Transparent" />
+                                    </Grid>
+                                </Border>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Margin="0,0,10,0">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="الوحدة" />
+                                <Border Style="{StaticResource Order.IconField}" Tag="{Binding EditValue, ElementName=Combo_Units, Mode=OneWay}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="32" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Style="{StaticResource Order.FieldIconBadge}">
+                                            <icons:PackIconMaterial Kind="Ruler" Style="{StaticResource Order.FieldIcon}" />
+                                        </Border>
+                                        <dxe:ComboBoxEdit x:Name="Combo_Units" ItemTemplate="{StaticResource StaticChoice.Template}" ItemsSource="{Binding Units}" IsTextEditable="False" PreviewKeyUp="OriginalNavigation_KeyUp" Grid.Column="1" ShowBorder="False" BorderThickness="0" Background="Transparent" />
+                                    </Grid>
+                                </Border>
+                            </StackPanel>
+                            <StackPanel Grid.Column="3" Margin="0,0,10,0">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="سعر الوحدة" />
+                                <Border Style="{StaticResource Order.IconField}" Tag="{Binding EditValue, ElementName=Text_Value, Mode=OneWay}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="32" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Style="{StaticResource Order.FieldIconBadge}">
+                                            <icons:PackIconMaterial Kind="CashMultiple" Style="{StaticResource Order.FieldIcon}" />
+                                        </Border>
+                                        <dxe:SpinEdit x:Name="Text_Value" PreviewKeyUp="OriginalNavigation_KeyUp" Grid.Column="1" ShowBorder="False" BorderThickness="0" Background="Transparent" />
+                                    </Grid>
+                                </Border>
+                            </StackPanel>
+                            <StackPanel Grid.Column="4">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text=" " />
+                                <dx:SimpleButton x:Name="Add_To_Prt_List" Style="{StaticResource ActionButton}" Margin="0" Click="Add_To_Prt_List_Click" Height="{DynamicResource Order.FieldHeight}" Background="#3559A0" Foreground="White" BorderBrush="#3559A0" AutomationProperties.Name="إضافة مادة">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <icons:PackIconMaterial Kind="Plus" Style="{StaticResource Order.ButtonIcon}" />
+                                        <TextBlock Text="إضافة مادة" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </dx:SimpleButton>
+                            </StackPanel>
+                        </Grid>
+                        <orders:AccessibleOrderGrid Grid.Row="2" x:Name="Parts_Grid" ItemsSource="{Binding Parts}" AutoGenerateColumns="None" SelectionMode="MultipleRow" MouseDoubleClick="Part_DoubleClick" FontSize="{DynamicResource Order.FieldFont}" BorderBrush="#E3E8F0" Foreground="#3F506F">
+                            <dxg:GridControl.Columns>
+                                <dxg:GridColumn FieldName="Name" HorizontalHeaderContentAlignment="Center" Header="المواد" Width="3*">
+                                    <dxg:GridColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <dxe:TextEdit x:Name="PART_Editor" HorizontalContentAlignment="Center" FontSize="14" Style="{StaticResource Dmc.GridCellText}" />
+                                        </DataTemplate>
+                                    </dxg:GridColumn.CellTemplate>
+                                </dxg:GridColumn>
+                                <dxg:GridColumn FieldName="Quantity" HorizontalHeaderContentAlignment="Center" Header="الكمية" Width="1.2*">
+                                    <dxg:GridColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <dxe:TextEdit x:Name="PART_Editor" HorizontalContentAlignment="Center" FontSize="14" Style="{StaticResource Dmc.GridCellText}" />
+                                        </DataTemplate>
+                                    </dxg:GridColumn.CellTemplate>
+                                    <dxg:GridColumn.EditSettings>
+                                        <dxe:TextEditSettings DisplayFormat="n3" />
+                                    </dxg:GridColumn.EditSettings>
+                                </dxg:GridColumn>
+                                <dxg:GridColumn FieldName="Unit" HorizontalHeaderContentAlignment="Center" Header="الوحدة" Width="1.1*" >
+                                    <dxg:GridColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <dxe:TextEdit x:Name="PART_Editor" HorizontalContentAlignment="Center" FontSize="14" Style="{StaticResource Dmc.GridCellText}" />
+                                        </DataTemplate>
+                                    </dxg:GridColumn.CellTemplate>
+                                </dxg:GridColumn>
+                                <dxg:GridColumn FieldName="Price" HorizontalHeaderContentAlignment="Center" Header="سعر الوحدة" Width="1.2*">
+                                    <dxg:GridColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <dxe:TextEdit x:Name="PART_Editor" HorizontalContentAlignment="Center" FontSize="14" Style="{StaticResource Dmc.GridCellText}" />
+                                        </DataTemplate>
+                                    </dxg:GridColumn.CellTemplate>
+                                    <dxg:GridColumn.EditSettings>
+                                        <dxe:TextEditSettings DisplayFormat="n3" />
+                                    </dxg:GridColumn.EditSettings>
+                                </dxg:GridColumn>
+                                <dxg:GridColumn FieldName="Total" HorizontalHeaderContentAlignment="Center" Header="الإجمالي" Width="1.4*">
+                                    <dxg:GridColumn.EditSettings>
+                                        <dxe:TextEditSettings DisplayFormat="n3" />
+                                    </dxg:GridColumn.EditSettings>
+                                    <dxg:GridColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <dxe:TextEdit x:Name="PART_Editor" HorizontalContentAlignment="Center" FontSize="14" Style="{StaticResource Dmc.GridCellText}" />
+                                        </DataTemplate>
+                                    </dxg:GridColumn.CellTemplate>
+                                </dxg:GridColumn>
+                                <dxg:GridColumn Header="حذف" CellTemplate="{StaticResource ButtonCellTemplate2}" Width="54" FixedWidth="True" AllowSorting="False" AllowColumnFiltering="False">
+
+                                </dxg:GridColumn>
+                            </dxg:GridControl.Columns>
+                            <dxg:GridControl.View>
+                                <dxg:TableView Style="{StaticResource OrderView}" />
+                            </dxg:GridControl.View>
+                        </orders:AccessibleOrderGrid>
+                    </Grid>
+                </Border>
+                <Border x:Name="OrderActionsCard" Grid.Row="4" Background="White" BorderBrush="#E0E5EE" BorderThickness="1" CornerRadius="8" Padding="12,8" Margin="0">
+                    <Grid Margin="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
+                            <dx:SimpleButton x:Name="Insert" Style="{StaticResource ActionButton}" Background="#3559A0" Foreground="White" Click="Insert_Click" Tag="Insert" IsEnabled="False" AutomationProperties.Name="إدراج جديد">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <icons:PackIconMaterial Kind="ContentSaveOutline" Style="{StaticResource Order.ButtonIcon}" />
+                                    <TextBlock Text="إدراج جديد" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </dx:SimpleButton>
+                            <dx:SimpleButton x:Name="Edite_button" Style="{StaticResource ActionButton}" Background="#EAF0FB" Foreground="#3559A0" Click="Edite_button_Click" Tag="Update" IsEnabled="False" AutomationProperties.Name="تعديل">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <icons:PackIconMaterial Kind="ContentSaveEditOutline" Style="{StaticResource Order.ButtonIcon}" />
+                                    <TextBlock Text="تعديل" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </dx:SimpleButton>
+                            <dx:SimpleButton x:Name="delete_button" Style="{StaticResource ActionButton}" Background="#FBEDEC" Foreground="#B34747" Click="delete_button_Click" Tag="Delete" IsEnabled="False" AutomationProperties.Name="حذف">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <icons:PackIconMaterial Kind="DeleteOutline" Style="{StaticResource Order.ButtonIcon}" />
+                                    <TextBlock Text="حذف" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </dx:SimpleButton>
+                            <dx:SimpleButton x:Name="Print_Button" Style="{StaticResource ActionButton}" Click="Print_Button_Click" Tag="Print" IsEnabled="False" Background="White" AutomationProperties.Name="طباعة">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <icons:PackIconMaterial Kind="Printer" Style="{StaticResource Order.ButtonIcon}" />
+                                    <TextBlock Text="طباعة" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </dx:SimpleButton>
+                            <dx:SimpleButton x:Name="clear_Button" Style="{StaticResource ActionButton}" Click="clear_Button_Click" Background="White" AutomationProperties.Name="تفريغ">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <icons:PackIconMaterial Kind="Eraser" Style="{StaticResource Order.ButtonIcon}" />
+                                    <TextBlock Text="تفريغ" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </dx:SimpleButton>
+                        </StackPanel>
+                        <dx:SimpleButton Grid.Column="1" x:Name="search_button" Style="{StaticResource ActionButton}" Click="Search_Click" Background="#253A62" Foreground="White" AutomationProperties.Name="بحث متقدم">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <icons:PackIconMaterial Kind="MagnifyPlusOutline" Style="{StaticResource Order.ButtonIcon}" />
+                                <TextBlock Text="بحث متقدم" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </dx:SimpleButton>
+                        <Border Style="{StaticResource Order.IconField}" Tag="{Binding EditValue, ElementName=Text_emng_Search, Mode=OneWay}" Grid.Column="2" Margin="8,0,0,0" MinWidth="120">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="32" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Border Style="{StaticResource Order.FieldIconBadge}">
+                                    <icons:PackIconMaterial Kind="Magnify" Style="{StaticResource Order.FieldIcon}" />
+                                </Border>
+                                <dxe:TextEdit x:Name="Text_emng_Search" NullText="بحث برقم التكليف" Height="{DynamicResource Order.FieldHeight}" PreviewKeyUp="OriginalNavigation_KeyUp" Grid.Column="1" ShowBorder="False" BorderThickness="0" Background="Transparent" />
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </Border>
+            </Grid>
+
+
+
+        </Grid>
+    </Border>
+</mah:MetroWindow>

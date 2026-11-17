@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net10.0-windows</TargetFramework><UseWPF>true</UseWPF><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable><NuGetAudit>false</NuGetAudit><StartupObject>Program</StartupObject><StartupObject Condition="'$(RegistrationProbe)' == 'true'">RegistrationProbe</StartupObject><StartupObject Condition="'$(DesignProbe)' == 'true'">DesignProbe</StartupObject></PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../../Maintenance request/Maintenance request/Maintenance request.csproj" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.6" />
+    <!-- النافذة الأصلية تستخدم عناوين موارد جذرية؛ تستضيف أداة الفحص النسخ نفسها. -->
+    <Resource Include="../../../Maintenance request/Maintenance request/Resources/ssf Logo.png" Link="Resources/ssf Logo.png" />
+    <Resource Include="../../../Maintenance request/Maintenance request/Resources/MINICO.ico" Link="Resources/MINICO.ico" />
+    <Resource Include="../../../Maintenance request/Maintenance request/Resources/mins4.jpg" Link="Resources/mins4.jpg" />
+  </ItemGroup>
+</Project>

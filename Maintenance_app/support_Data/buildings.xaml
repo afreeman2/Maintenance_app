@@ -1,0 +1,408 @@
+﻿<mah:MetroWindow     
+x:Class="Maintenance_app.support_Data.buildings"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+                     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                     xmlns:vm="clr-namespace:Maintenance_app.converts" 
+                     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+                     xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+                     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+                     xmlns:local="clr-namespace:Maintenance_app.support_Data"
+                     xmlns:local2="clr-namespace:Maintenance_app.viewo_Model"
+                     xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+                     xmlns:mah1="http://metro.mahapps.com/winfx/xaml/simplechildwindow"
+                     xmlns:syncfusion="http://schemas.syncfusion.com/wpf" 
+                     xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+                     DataContext="{dxmvvm:ViewModelSource Type=local2:building_viewmodel}"
+                     dx:ThemeManager.ThemeName="None" mc:Ignorable="d" Height="510" Width="530"
+                     BorderBrush="{x:Null}" WindowStyle="None" AllowsTransparency="True"
+                     ShowTitleBar="False" IsCloseButtonEnabled="False" ShowCloseButton="False" 
+                     Background="{x:Null}"  ResizeMode="NoResize"
+    Icon="{iconPacks:MaterialImage Kind=OfficeBuilding}"
+                     WindowStartupLocation="CenterScreen" TitleAlignment="Center" 
+                     Title="ادارة المباني" Loaded="MetroWindow_Loaded" FontFamily="Segoe UI"
+                     FlowDirection="RightToLeft" UseLayoutRounding="True" SnapsToDevicePixels="True">
+    <mah:MetroWindow.Resources>
+        <!-- GridSearchControl -->
+        <Style x:Key="ArabicGridSearchControlStyle" TargetType="{x:Type dxg:GridSearchControl}">
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="FlowDirection" Value="RightToLeft" />
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="TextBlock.TextAlignment" Value="Center" />
+            <!-- النص عند عدم وجود بحث -->
+            <Setter Property="NullText" Value="أدخل الجهة" />
+            <!-- إظهار NullText حتى عند التركيز -->
+            <Setter Property="ShowNullTextIfFocused" Value="True" />
+        </Style>
+        <DataTemplate x:Key="ButtonCellTemplate">
+            <dx:SimpleButton Command="{Binding DeleteCommand, ElementName=EditFormBehavior}" CommandParameter="{Binding Row}" IsEnabled="True">
+                <iconPacks:PackIconMaterialDesign Foreground="Red" Kind="Delete" Height="22" Width="30" />
+            </dx:SimpleButton>
+        </DataTemplate>
+        <Style x:Key="mybl" TargetType="{x:Type Label}">
+            <Setter Property="Foreground" Value="White" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="true">
+                    <Setter Property="Foreground" Value="Black" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <!--<Style x:Key="CELLTEXT"-->
+        <!--TargetType="{x:Type TextBox}" >
+            
+            <Style.Triggers>
+                <Trigger Property="IsFocused" Value="true">
+                    <Setter Property="Background" Value="AntiqueWhite"/>
+                </Trigger>
+            </Style.Triggers>
+            <EventSetter Event="PreviewTextInput" Handler="TextBox_PreviewTextInput"/>-->
+        <!--</Style>-->
+        <Style x:Key="mytext" TargetType="{x:Type TextBox}">
+            <!--<Setter Property="Background" Value="Yellow" />-->
+            <Style.Triggers>
+                <!--<MultiTrigger >
+                    <MultiTrigger.Conditions>
+                        <Condition Property="IsFocused" Value="true"/>
+                        <Condition Property="Text" Value=""/>
+
+                    </MultiTrigger.Conditions>
+                    <Setter Property="Background" Value="AntiqueWhite"/>
+
+                </MultiTrigger>
+
+
+                <MultiTrigger >
+                    <MultiTrigger.Conditions>
+                        <Condition Property="IsFocused" Value="true"/>
+                        <Condition Property="Text" Value="{x:Null}"/>
+
+                    </MultiTrigger.Conditions>
+                    <Setter Property="Background" Value="AntiqueWhite"/>
+
+                </MultiTrigger>-->
+                <!--<Trigger Property="Text" Value="{x:Null}">
+                    <Setter Property="Background" Value="White"/>
+                </Trigger>
+                <Trigger Property="Text" Value="">
+                    <Setter Property="Background" Value="White"/>
+                </Trigger>-->
+                <Trigger Property="IsFocused" Value="true">
+                    <Setter Property="Background" Value="AntiqueWhite" />
+                </Trigger>
+                <Trigger Property="IsFocused" Value="false">
+                    <Setter Property="Background" Value="#FFDEF7C5" />
+                </Trigger>
+                <MultiTrigger>
+                    <MultiTrigger.Conditions>
+                        <Condition Property="IsFocused" Value="false" />
+                        <Condition Property="Text" Value="{x:Null}" />
+                    </MultiTrigger.Conditions>
+                    <Setter Property="Background" Value="White" />
+                </MultiTrigger>
+                <MultiTrigger>
+                    <MultiTrigger.Conditions>
+                        <Condition Property="IsFocused" Value="false" />
+                        <Condition Property="Text" Value="" />
+                    </MultiTrigger.Conditions>
+                    <Setter Property="Background" Value="White" />
+                </MultiTrigger>
+                <MultiTrigger>
+                    <MultiTrigger.Conditions>
+                        <Condition Property="IsFocused" Value="false" />
+                        <Condition Property="Text" Value="__/__/____" />
+                    </MultiTrigger.Conditions>
+                    <Setter Property="Background" Value="White" />
+                </MultiTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="RightAlignStyle" TargetType="{x:Type TextBlock}">
+            <Setter Property="TextAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="FontSize" Value="8" />
+        </Style>
+        <Style x:Key="rig" TargetType="{x:Type TextBlock}">
+            <Setter Property="TextAlignment" Value="Left" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="FontSize" Value="8" />
+        </Style>
+        <Style x:Key="mygroup" TargetType="{x:Type GroupBox}" />
+        <!--**************************-->
+        <DataTemplate x:Key="CustomHeaderTemplate">
+            <DockPanel x:Name="dpHeader" VerticalAlignment="Bottom" LastChildFill="True" Width="0" Height="0" Margin="-10,0,-22,-6" Visibility="Hidden">
+                <Button x:Name="PART_BackButton" Command="{Binding InternalCloseCommand, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type mah:Flyout}}}" CommandParameter="{Binding CloseCommandParameter, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type mah:Flyout}}}" Width="50" Height="50" Margin="2 4 2 2" VerticalAlignment="Bottom" Style="{DynamicResource MahApps.Metro.Styles.MetroCircleButtonStyle}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type mah:Flyout}}}" FontFamily="Segoe UI Symbol" FontSize="16" DockPanel.Dock="Left" Background="{DynamicResource AccentColorBrush}" IsCancel="{Binding CloseButtonIsCancel, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type mah:Flyout}}}" Visibility="{Binding CloseButtonVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type mah:Flyout}}}" BorderBrush="#FF191616">
+                    <ContentControl Style="{DynamicResource PathIconContentControlStyle}" Content="M19,34V42H43.75L33.75,52H44.25L58.25,38L44.25,24H33.75L43.75,34H19Z" Width="20" Height="20" />
+                </Button>
+                <TextBlock x:Name="PART_BackHeaderText" Margin="0 0 15 0" TextAlignment="Right" VerticalAlignment="Center" Text="{Binding}" Visibility="{Binding TitleVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type mah:Flyout}}}" />
+            </DockPanel>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding Position, RelativeSource={RelativeSource AncestorType={x:Type mah:Flyout}}}" Value="Left">
+                    <Setter TargetName="PART_BackHeaderText" Property="Margin" Value="15 0 0 0" />
+                    <Setter TargetName="PART_BackHeaderText" Property="TextAlignment" Value="Left" />
+                    <Setter TargetName="PART_BackButton" Property="DockPanel.Dock" Value="Left" />
+                    <Setter TargetName="PART_BackButton" Property="LayoutTransform">
+                        <Setter.Value>
+                            <ScaleTransform ScaleX="-1" />
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Position, RelativeSource={RelativeSource AncestorType={x:Type mah:Flyout}}}" Value="Top">
+                    <Setter TargetName="PART_BackButton" Property="LayoutTransform">
+                        <Setter.Value>
+                            <RotateTransform Angle="-90" />
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Position, RelativeSource={RelativeSource AncestorType={x:Type mah:Flyout}}}" Value="Bottom">
+                    <Setter TargetName="PART_BackButton" Property="LayoutTransform">
+                        <Setter.Value>
+                            <RotateTransform Angle="270" />
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+        <ControlTemplate x:Key="GroupBoxControlTemplate2" TargetType="{x:Type GroupBox}">
+            <Grid SnapsToDevicePixels="True">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="6" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="6" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="6" />
+                </Grid.RowDefinitions>
+                <Border BorderBrush="Transparent" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Grid.ColumnSpan="4" Grid.Column="0" CornerRadius="4" Grid.Row="1" Grid.RowSpan="3" />
+                <Border BorderBrush="White" BorderThickness="{TemplateBinding BorderThickness}" Grid.ColumnSpan="4" CornerRadius="4" Grid.Row="1" Grid.RowSpan="3">
+                    <Border.OpacityMask>
+                        <MultiBinding ConverterParameter="7" UpdateSourceTrigger="Default">
+                            <MultiBinding.Converter>
+                                <BorderGapMaskConverter />
+                            </MultiBinding.Converter>
+                            <Binding ElementName="Header" Path="ActualWidth" />
+                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Self}" />
+                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Self}" />
+                        </MultiBinding>
+                    </Border.OpacityMask>
+                    <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="3">
+                        <Border BorderBrush="White" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="2" />
+                    </Border>
+                </Border>
+                <Border x:Name="Header" Grid.Column="1" Padding="3,1,3,0" Grid.Row="0" Grid.RowSpan="2">
+                    <ContentPresenter ContentTemplate="{TemplateBinding HeaderTemplate}" Content="{TemplateBinding Header}" ContentStringFormat="{TemplateBinding HeaderStringFormat}" ContentSource="Header" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" Margin="0,-4,0,4" />
+                </Border>
+                <ContentPresenter Grid.ColumnSpan="2" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" Grid.Column="1" ContentStringFormat="{TemplateBinding ContentStringFormat}" Margin="{TemplateBinding Padding}" Grid.Row="2" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+            </Grid>
+        </ControlTemplate>
+        <Style x:Key="mybl2" TargetType="{x:Type Label}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding is_cancled}" Value="True">
+                    <Setter Property="Content" Value="صرف" />
+                    <Setter Property="Foreground" Value="Black" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding is_cancled}" Value="False">
+                    <Setter Property="Content" Value="إلغاء" />
+                    <Setter Property="Foreground" Value="Red" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="mybl3" TargetType="{x:Type Label}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding is_cancled}" Value="True">
+                    <Setter Property="Content" Value="صرف" />
+                    <Setter Property="Foreground" Value="Black" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding is_cancled}" Value="False">
+                    <Setter Property="Content" Value="إلغاء" />
+                    <Setter Property="Foreground" Value="Red" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="mybl4" TargetType="{x:Type Label}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding is_cancled}" Value="True">
+                    <Setter Property="Content" Value="صرف" />
+                    <Setter Property="Foreground" Value="Black" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding is_cancled}" Value="False">
+                    <Setter Property="Content" Value="إلغاء" />
+                    <Setter Property="Foreground" Value="Red" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="mybl5" TargetType="{x:Type Label}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding is_cancled}" Value="True">
+                    <Setter Property="Content" Value="صرف" />
+                    <Setter Property="Foreground" Value="Black" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding is_cancled}" Value="False">
+                    <Setter Property="Content" Value="إلغاء" />
+                    <Setter Property="Foreground" Value="Red" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </mah:MetroWindow.Resources>
+    <mah:MetroWindow.OpacityMask>
+        <VisualBrush Visual="{Binding ElementName=mybo}" />
+    </mah:MetroWindow.OpacityMask>
+    <Border x:Name="mybo" BorderBrush="{StaticResource Dmc.Border}" BorderThickness="1" HorizontalAlignment="Left" Width="503" CornerRadius="18" FlowDirection="RightToLeft" Background="White" Height="500" Margin="20,0,0,6" VerticalAlignment="Bottom" Style="{StaticResource Dmc.WindowCard}">
+        <Grid Width="494" Margin="3,2,4,-1">
+            <Button x:Name="cancel" Click="btnCancel_Click" BorderBrush="Black" TabIndex="4" FontFamily="Segoe UI" FontSize="16" FontWeight="Bold" HorizontalAlignment="Left" Width="122" Height="38" VerticalAlignment="Top" Background="{StaticResource Dmc.BlueSoft}" Margin="350,126,0,0" Style="{StaticResource Dmc.SecondaryButton}" Padding="6,0" Foreground="{StaticResource Dmc.Blue}" BorderThickness="0">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Orientation="Horizontal">
+                    <iconPacks:PackIconBootstrapIcons Kind="XCircleFill" Margin="0,0,7,0" Width="18" Height="18" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
+                    <TextBlock FontSize="12" VerticalAlignment="Center" Text="إلغاء الأمر" FontWeight="SemiBold" />
+                </StackPanel>
+            </Button>
+            <Button x:Name="insert" Click="insert_Click" BorderBrush="Black" TabIndex="3" FontFamily="Segoe UI" FontSize="16" FontWeight="Bold" HorizontalAlignment="Left" Width="122" Height="38" VerticalAlignment="Top" Background="#213F6A" Margin="220,126,0,0" Style="{StaticResource Dmc.PrimaryButton}" Padding="6,0" Foreground="White" BorderThickness="0">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Orientation="Horizontal">
+                    <iconPacks:PackIconMaterialDesign Kind="LibraryAddCheck" Margin="0,0,7,0" Width="18" Height="18" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
+                    <TextBlock FontSize="12" VerticalAlignment="Center" Text="حفظ" FontWeight="SemiBold" />
+                </StackPanel>
+            </Button>
+            <Button x:Name="btnCancel" Click="btnCancel_Click" Visibility="Visible" Height="37" Width="36" FontFamily="Segoe UI" FontSize="15" FontWeight="Bold" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" BorderBrush="{x:Null}" BorderThickness="0" Background="#32DF6363" Margin="447,10,0,0" Style="{StaticResource Dmc.SecondaryButton}" Panel.ZIndex="10" Padding="0">
+                <iconPacks:PackIconBootstrapIcons Kind="XCircle" Foreground="White" Width="22" Height="22" />
+            </Button>
+            <Border BorderThickness="0" Margin="6,4,0,0" Height="48" VerticalAlignment="Top" HorizontalAlignment="Left" Width="482" Background="#213F6A" CornerRadius="12,12,0,0">
+                <iconPacks:PackIconMaterial Kind="OfficeBuilding" Foreground="White" Height="27" Width="27" Margin="9,0,0,0" VerticalAlignment="Center" />
+            </Border>
+            <Label Content="المبني:" HorizontalAlignment="Left" Foreground="Black" Height="34" Margin="46,75,0,0" VerticalAlignment="Top" Width="59" FontWeight="Bold" FontFamily="Segoe UI" FontSize="14" Background="White" />
+            <dxg:GridControl MouseDoubleClick="Benef_List_MouseDoubleClick" x:Name="Benef_List" RestoreStateKeyFieldName="Build_ID" RestoreStateOnSourceChange="True" dx:ThemeManager.ThemeName="Win11Light" Margin="2,181,0,10" AllowColumnMRUFilterList="False" AllowMRUFilterList="False" IsFilterEnabled="False" ShowAllTableValuesInCheckedFilterPopup="False" SelectionMode="Row" DesignTimeDataSourceRowCount="0" ItemsSource="{Binding ItemsSource, Mode=OneWay}">
+                <dxg:GridControl.View>
+                    <dxg:TableView x:Name="View" DataSourceRefreshCommand="{Binding DataSourceRefreshCommand}" ShowFixedTotalSummary="False" AllowHeaderNavigation="True" AllowEditing="False" ShowSearchPanelMode="Never" HeaderHorizontalAlignment="Center" RowMinHeight="30" AllowGroupingSortingBySingleColumnOnly="False" AllowMoveColumnToDropArea="False" AllowFixedGroups="False" ShowGroupPanel="False" ShowIndicator="False" AutoWidth="False" FontWeight="Bold" HeaderPanelMinHeight="30" BestFitModeOnSourceChange="AllRows" AllowBestFit="True" BestFitMode="AllRows" AllowPerPixelScrolling="True" ScrollAnimationMode="EaseInOut" VerticalScrollbarVisibility="Auto" SearchStringToFilterCriteria="View_SearchStringToFilterCriteria" SearchPanelFindFilter="StartsWith" />
+                </dxg:GridControl.View>
+                <dxmvvm:Interaction.Behaviors>
+                    <dxg:DialogEditFormBehavior x:Name="EditFormBehavior" KeyProperty="Build_ID" CreateEditItemViewModelCommand="{Binding CreateEditEntityViewModelCommand}" ValidateRowCommand="{Binding ValidateRowCommand}" ValidateRowDeletionCommand="{Binding ValidateRowDeletionCommand}" />
+                </dxmvvm:Interaction.Behaviors>
+                <dxg:GridControl.InputBindings>
+                    <KeyBinding Key="Delete" Command="{Binding DeleteCommand, ElementName=EditFormBehavior}" />
+                    <KeyBinding Key="F2" Command="{Binding UpdateCommand, ElementName=EditFormBehavior}" />
+                    <KeyBinding Key="N" Command="{Binding CreateCommand, ElementName=EditFormBehavior}" Modifiers="Control" />
+                </dxg:GridControl.InputBindings>
+                <dxg:GridColumn IsSmart="True" FieldName="Build" AllowGrouping="False" AllowMoving="False" HorizontalHeaderContentAlignment="Center" Width="400" Header="المباني" FixedWidth="True" MaxWidth="400">
+                    <dxg:GridColumn.HeaderStyle>
+                        <Style TargetType="{x:Type dxg:BaseGridHeader}">
+                            <Setter Property="dxg:BaseGridColumnHeader.ShowFilterButtonOnHover" Value="False" />
+                            <Setter Property="Background" Value="#213F6A" />
+                            <Setter Property="Foreground" Value="White" />
+                        </Style>
+                    </dxg:GridColumn.HeaderStyle>
+                    <dxg:GridColumn.CellTemplate>
+                        <DataTemplate>
+                            <dxe:TextEdit x:Name="PART_Editor" HorizontalContentAlignment="Center" FontSize="14" Style="{StaticResource Dmc.GridCellText}" />
+                        </DataTemplate>
+                    </dxg:GridColumn.CellTemplate>
+                </dxg:GridColumn>
+                <dxg:GridColumn IsSmart="True" Header="حذف" CellTemplate="{StaticResource ButtonCellTemplate}" HorizontalHeaderContentAlignment="Center" Width="*">
+                    <dxg:GridColumn.HeaderStyle>
+                        <Style TargetType="{x:Type dxg:BaseGridHeader}">
+                            <Setter Property="dxg:BaseGridColumnHeader.ShowFilterButtonOnHover" Value="False" />
+                            <Setter Property="Background" Value="#213F6A" />
+                            <Setter Property="Foreground" Value="White" />
+                        </Style>
+                    </dxg:GridColumn.HeaderStyle>
+                </dxg:GridColumn>
+
+            </dxg:GridControl>
+
+            <Separator IsTabStop="False" Height="49" Background="White" Margin="43,-20,422,421" RenderTransformOrigin="0.5,0.5" Width="20">
+                <Separator.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform />
+                        <SkewTransform />
+                        <RotateTransform Angle="90" />
+                        <TranslateTransform />
+                    </TransformGroup>
+                </Separator.RenderTransform>
+            </Separator>
+            <TextBlock HorizontalAlignment="Left" Margin="66,15,0,0" Foreground="White" TextWrapping="NoWrap" VerticalAlignment="Top" Height="28" Width="364" FontFamily="Segoe UI" FontSize="16" FontWeight="Bold">
+        <Run FlowDirection="RightToLeft" Text="إدارة " />
+        <Run FlowDirection="RightToLeft" Text="المباني" />
+            </TextBlock>
+            <Border BorderBrush="{StaticResource Dmc.Border}" BorderThickness="1" CornerRadius="12" Background="White" Height="40" VerticalAlignment="Top" HorizontalAlignment="Left" Width="364" Margin="106,69,0,0">
+                <dxg:GridSearchControl DataObject.Pasting="TxtName_Pasting" Validation.ErrorTemplate="{StaticResource errorTemplateSilverlightStyle3}" BorderThickness="0" Loaded="TxtName_Loaded" Style="{StaticResource ArabicGridSearchControlStyle}" View="{Binding ElementName=View,Mode=OneTime}" CornerRadius="5" x:Name="TxtName" dx:ThemeManager.ThemeName="Win11Light" Visibility="Visible" Margin="0" NullText="أدخل المباني" ShowNullTextIfFocused="True" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderBrush="{x:Null}" PreviewTextInput="TxtName_PreviewTextInput" PreviewKeyUp="TxtName_PreviewKeyUp" Height="40" VerticalAlignment="Center" AllowAnimation="True" Foreground="{StaticResource Dmc.Text}" FontSize="14" Background="{StaticResource Dmc.FieldBackground}" IsTabStop="True" TabIndex="1">
+                    <dxg:GridSearchControl.Tag>
+                        <Binding RelativeSource="{RelativeSource Mode=Self}" Path="Tag" Mode="TwoWay" UpdateSourceTrigger="Explicit" NotifyOnValidationError="True" ValidatesOnDataErrors="True" ValidatesOnExceptions="True" ValidatesOnNotifyDataErrors="True">
+                            <Binding.ValidationRules>
+                                <vm:ErrorRule />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </dxg:GridSearchControl.Tag>
+                </dxg:GridSearchControl>
+            </Border>
+            <mah:Flyout Header="" IsModal="True" IsPinned="False" Position="Bottom" Theme="Light" x:Name="config_Nationalty" Margin="2,0,-5,-23" BorderThickness="2" HeaderTemplate="{StaticResource CustomHeaderTemplate}" Height="505" AreAnimationsEnabled="True" AnimateOpacity="False" VerticalAlignment="Bottom" d:IsHidden="True">
+                <mah:Flyout.Background>
+                    <SolidColorBrush Color="White" Opacity="0" />
+                </mah:Flyout.Background>
+                <Border BorderBrush="{StaticResource Dmc.Border}" CornerRadius="18" Background="White" Width="446" Height="208" Margin="0,97,0,0" VerticalAlignment="Top" BorderThickness="1" Style="{StaticResource Dmc.WindowCard}">
+                    <Grid Margin="4.4,0.4,2.8,0.4" Width="436">
+                        <Button x:Name="update_button" Click="update_button_ClickAsync" BorderBrush="Black" TabIndex="23" FontFamily="Segoe UI" FontSize="16" FontWeight="Bold" HorizontalAlignment="Left" Width="122" Height="38" VerticalAlignment="Top" Background="#213F6A" Margin="87,150,0,0" Style="{StaticResource Dmc.SecondaryButton}" Padding="6,0" Foreground="White" BorderThickness="0">
+                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Orientation="Horizontal">
+                                <iconPacks:PackIconMaterialDesign Kind="LibraryAddCheck" Margin="0,0,7,0" Width="18" Height="18" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type Button}}}" />
+                                <TextBlock FontSize="12" VerticalAlignment="Center" Text="حفظ" FontWeight="SemiBold" Foreground="White" />
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="closeconfig" Click="closeconfig_Click" Visibility="Visible" Height="36" Width="35" FontFamily="Segoe UI" FontSize="15" FontWeight="Bold" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" BorderBrush="{x:Null}" BorderThickness="0" Background="#32DF6363" Margin="388,10,0,0" Style="{StaticResource Dmc.SecondaryButton}" Panel.ZIndex="10" Padding="0">
+                            <iconPacks:PackIconBootstrapIcons Kind="XCircle" Foreground="White" Width="22" Height="22" />
+                        </Button>
+                        <Label Content="المــبنــي:" HorizontalAlignment="Left" Foreground="Black" Height="34" VerticalAlignment="Center" Width="83" FontWeight="Bold" FontFamily="Segoe UI" FontSize="14" Background="White" Margin="6,0,0,0" />
+                        <Border BorderThickness="0" Margin="6,4,0,0" Height="48" VerticalAlignment="Top" HorizontalAlignment="Left" Width="424" Background="#213F6A" CornerRadius="12,12,0,0">
+                            <iconPacks:PackIconMaterial Kind="OfficeBuilding" Foreground="White" Height="27" Width="27" Margin="9,0,0,0" VerticalAlignment="Center" />
+                        </Border>
+                        <TextBlock HorizontalAlignment="Left" Foreground="White" Margin="66,15,0,0" TextWrapping="NoWrap" VerticalAlignment="Top" Height="28" Width="306" FontFamily="Segoe UI" FontSize="16" FontWeight="Bold"><Run FlowDirection="RightToLeft" Text="عدل " /><Run Text=" "/><Run FlowDirection="RightToLeft" Text="المباني" /></TextBlock>
+                        <Separator IsTabStop="False" Height="49" Background="White" Margin="46,2,370,154" RenderTransformOrigin="0.5,0.5" Width="20">
+                            <Separator.RenderTransform>
+                                <TransformGroup>
+                                    <ScaleTransform />
+                                    <SkewTransform />
+                                    <RotateTransform Angle="90" />
+                                    <TranslateTransform />
+                                </TransformGroup>
+                            </Separator.RenderTransform>
+                        </Separator>
+                        <Button x:Name="cancel_button" Click="closeconfig_Click" BorderBrush="Black" TabIndex="24" FontFamily="Segoe UI" FontSize="16" FontWeight="Bold" HorizontalAlignment="Left" Width="122" Height="38" VerticalAlignment="Top" Background="{StaticResource Dmc.BlueSoft}" Margin="250,150,0,0" Style="{StaticResource Dmc.SecondaryButton}" Padding="6,0" Foreground="{StaticResource Dmc.Blue}" BorderThickness="0">
+                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Orientation="Horizontal">
+                                <iconPacks:PackIconMaterialDesign Kind="ExitToApp" Margin="0,0,7,0" Width="18" Height="18" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type Button}}}" />
+                                <TextBlock FontSize="12" VerticalAlignment="Center" Text="إلغاء الأمر" FontWeight="SemiBold" />
+                            </StackPanel>
+                        </Button>
+                        <Border BorderBrush="{StaticResource Dmc.Border}" BorderThickness="1" CornerRadius="12" Background="White" Height="40" VerticalAlignment="Center" HorizontalAlignment="Left" Width="344" Margin="66,0,0,0">
+                            <TextBox x:Name="TxtName_update" BorderThickness="1" BorderBrush="{x:Null}" Margin="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" TabIndex="21" MaxLength="150" FontWeight="Bold" FlowDirection="RightToLeft" PreviewKeyUp="TxtName_update_PreviewKeyUp" SelectionBrush="Black" TextChanged="TxtName_update_TextChanged" mah:TextBoxHelper.Watermark="ادخل المباني" mah:TextBoxHelper.WatermarkAlignment="Center">
+                                <TextBox.Style>
+                                    <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource MahApps.Styles.TextBox}">
+                                        <Setter Property="mah:TextBoxHelper.ClearTextButton" Value="True" />
+                                        <Style.Triggers>
+                                            <Trigger Property="mah:TextBoxHelper.HasText" Value="False">
+                                                <Setter Property="mah:TextBoxHelper.ClearTextButton" Value="False" />
+                                            </Trigger>
+                                            <Trigger Property="mah:TextBoxHelper.HasText" Value="True">
+                                                <Setter Property="mah:TextBoxHelper.ClearTextButton" Value="True" />
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBox.Style>
+                                <TextBox.Tag>
+                                    <Binding RelativeSource="{RelativeSource Mode=Self}" Path="Tag" Mode="TwoWay" UpdateSourceTrigger="Explicit" NotifyOnValidationError="True" ValidatesOnDataErrors="True" ValidatesOnExceptions="True" ValidatesOnNotifyDataErrors="True">
+                                        <Binding.ValidationRules>
+                                            <vm:ErrorRule />
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </TextBox.Tag>
+                            </TextBox>
+                        </Border>
+                    </Grid>
+                </Border>
+            </mah:Flyout>
+        </Grid>
+    </Border>
+</mah:MetroWindow>
