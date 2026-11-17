@@ -366,3 +366,10 @@ FodyWeavers.xsd
 /output/MaintenanceSetup/
 /output/login-password-demo.mp4
 /tmp/
+
+# يُتتبّع ملف إبقاء المجلد فقط، وتبقى مخرجات البناء والتثبيت محلية.
+!/release/
+/release/*
+!/release/.gitkeep
+/setup/*
+!/setup/.gitkeep
