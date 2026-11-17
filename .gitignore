@@ -372,3 +372,18 @@ FodyWeavers.xsd
 !/release/**
 !/setup/
 !/setup/**
+
+# يُتتبّع مسار Release الأصلي للتوزيع مع استثناء ملفات الاتصال المحلية.
+!/Maintenance_app/bin/
+/Maintenance_app/bin/*
+!/Maintenance_app/bin/x64/
+/Maintenance_app/bin/x64/*
+!/Maintenance_app/bin/x64/Release/
+!/Maintenance_app/bin/x64/Release/**
+/Maintenance_app/bin/x64/Release/**/ConectionString
+/Maintenance_app/bin/x64/Release/**/InstalledConnection.dat
+
+# يُتتبّع المثبّت الرئيسي في مسار الحزمة الأصلي.
+!/output/MaintenanceSetup/
+/output/MaintenanceSetup/*
+!/output/MaintenanceSetup/Setup.exe
