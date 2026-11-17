@@ -61,3 +61,7 @@
 #*.PDF   diff=astextplain
 #*.rtf   diff=astextplain
 #*.RTF   diff=astextplain
+
+# تُرفع ملفات الإصدار والمثبّتات عبر Git LFS مع الالتزامات التي تحتويها.
+/release/** filter=lfs diff=lfs merge=lfs -text
+/setup/** filter=lfs diff=lfs merge=lfs -text
