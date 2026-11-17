@@ -26,7 +26,9 @@ public partial class MaintenanceReportsWindow
     internal MaintenanceReportsWindow(Func<AggregatedContext> branchContextFactory, bool branchAccess)
     {
         ArgumentNullException.ThrowIfNull(branchContextFactory);
-        if (!branchAccess) throw new UnauthorizedAccessException("عرض تقارير الفروع يتطلب صلاحية تقارير الفروع.");
+        // يُمنع فتح التقارير المجمّعة مباشرةً في نسخة الفروع، حتى عند وجود صلاحية قديمة.
+        if (!DeploymentEdition.IncludesBranchReports || !branchAccess)
+            throw new UnauthorizedAccessException("عرض تقارير الفروع يتطلب نسخة الإدارة وصلاحية تقارير الفروع.");
         createContext = null;
         createBranchContext = branchContextFactory;
         InitializeReportWindow();

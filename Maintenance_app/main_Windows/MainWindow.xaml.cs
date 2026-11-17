@@ -207,7 +207,11 @@ namespace Maintenance_app
             AddWorkspaceAction(actions, "reference", "الإدارات والأقسام", "عرض الإدارات المرتبطة ببيانات الصيانة.", "Ctrl+4", "OfficeBuildingCogOutline", SupportManagementsMenu);
             AddWorkspaceAction(actions, "reference", "الأقسام والوحدات", "عرض الأقسام والوحدات التابعة للإدارات.", "Ctrl+5", "SourceBranch", SupportSectionsMenu);
             AddWorkspaceAction(actions, "reports", "تقارير الصيانة", "البحث في التكليفات وعرض تقارير الإنهاء.", "Ctrl+C", "ClipboardTextClock", report_mnue);
-            AddWorkspaceAction(actions, "reports", "تقارير الفروع", "عرض وطباعة تقارير الصيانة حسب الفرع.", BranchReportsMenu.InputGestureText, "OfficeBuildingOutline", BranchReportsMenu);
+            // تختفي التقارير المجمّعة من القائمة وبطاقات الرئيسية في نسخة الفروع.
+            if (DeploymentEdition.IncludesBranchReports)
+                AddWorkspaceAction(actions, "reports", "تقارير الفروع", "عرض وطباعة تقارير الصيانة حسب الفرع.", BranchReportsMenu.InputGestureText, "OfficeBuildingOutline", BranchReportsMenu);
+            else
+                BranchReportsMenu.Visibility = Visibility.Collapsed;
             AddWorkspaceAction(actions, "reports", "نموذج الفحص اليومي", "اختيار المبنى والفاحص وطباعة نموذج الفحص اليومي.", "Alt+Y", "ClipboardCheckOutline", DailyInspectionMenu);
             AddWorkspaceAction(actions, "reports", "نموذج الفحص اليومي للخدمات", "اختيار المبنى والفاحص وطباعة نموذج الفحص اليومي للخدمات.", "Alt+X", "ClipboardCheckOutline", DailyInspectionSERVICEMenu);
 
@@ -794,10 +798,10 @@ namespace Maintenance_app
             BringReportWindowToFront(maintenanceReportsWindow);
         }
 
-        // صلاحية تقارير الفروع مستقلة، وتُفحص أيضًا عند تنفيذ الأمر من بطاقة الوصول السريع.
+        // يُفحص نوع النسخة وصلاحية المستخدم قبل فتح نافذة التقارير المجمّعة.
         private void BranchReportsMenu_Click(object sender, RoutedEventArgs e)
         {
-            if (!BranchReportsMenu.IsEnabled) return;
+            if (!DeploymentEdition.IncludesBranchReports || !BranchReportsMenu.IsEnabled) return;
             if (branchReportsWindow is { IsLoaded: true })
             {
                 BringReportWindowToFront(branchReportsWindow);

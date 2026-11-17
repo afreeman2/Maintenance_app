@@ -4,6 +4,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Maintenance_app;
 using Maintenance_app.Dashboard;
 using MahApps.Metro.Controls;
 using Microsoft.Data.SqlClient;
@@ -20,6 +21,9 @@ public partial class SetupWindow : MetroWindow
     public SetupWindow()
     {
         InitializeComponent();
+        // يميّز اسم النسخة نافذة تثبيت الفروع قبل إدخال بيانات الاتصال.
+        if (!DeploymentEdition.IncludesBranchReports)
+            SetupHeading.Text = Title += " – نسخة الفروع";
         ServerName.Focus();
     }
 

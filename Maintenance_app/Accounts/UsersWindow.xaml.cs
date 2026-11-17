@@ -211,20 +211,21 @@ public partial class UsersWindow : MetroWindow
 
     private static bool[] GetPermissionValues(T_SystemUser user)
     {
-        return new[]
-        {
-                user.forbuild,
-                user.foremp,
-                user.forlocation,
-                user.formaint,
-                user.fordon,
-                user.formaintrepo,
-                user.formangreq,
-                user.foruser,
-                user.forservices,
-                user.mang_check,
-                user.branch_report
-            };
+        bool[] permissions =
+        [
+            user.forbuild,
+            user.foremp,
+            user.forlocation,
+            user.formaint,
+            user.fordon,
+            user.formaintrepo,
+            user.formangreq,
+            user.foruser,
+            user.forservices,
+            user.mang_check
+        ];
+        // يشمل التحديد الجماعي الصلاحيات التي يعرضها الإصدار الحالي.
+        return DeploymentEdition.IncludesBranchReports ? [.. permissions, user.branch_report] : permissions;
     }
 
     private static void SetAllPermissions(T_SystemUser user, bool enabled)
@@ -239,7 +240,9 @@ public partial class UsersWindow : MetroWindow
         user.foruser = enabled;
         user.forservices = enabled;
         user.mang_check = enabled;
-        user.branch_report = enabled;
+        // يحتفظ الحساب بصلاحية تقارير الفروع المسجلة عند استخدام نسخة الفروع.
+        if (DeploymentEdition.IncludesBranchReports)
+            user.branch_report = enabled;
     }
 
     private static IEnumerable<T> FindVisualChildren<T>(DependencyObject parent)
@@ -280,6 +283,9 @@ public partial class UsersWindow : MetroWindow
     public UsersWindow()
     {
         InitializeComponent();
+        // تُدار صلاحية التقارير المجمّعة من نسخة الإدارة.
+        if (!DeploymentEdition.IncludesBranchReports)
+            chkNewYear.Visibility = Visibility.Collapsed;
     }
 
     private async void MetroWindow_Loaded(object sender, RoutedEventArgs e)
@@ -630,10 +636,14 @@ public partial class UsersWindow : MetroWindow
     #endregion
 
     #region التنقل من صلاحية إنهاء الصيانة
-    // يتابع مفتاح Enter التنقل إلى صلاحية تقارير الفروع.
+    // ينقل Enter التركيز إلى الصلاحية التالية الظاهرة أو إلى زر اعتماد التغييرات.
     private void CompletionPermission_PreviewKeyUp(object sender, System.Windows.Input.KeyEventArgs e)
     {
-        if (e.Key == Key.Enter) chkNewYear.Focus();
+        if (e.Key != Key.Enter) return;
+        if (DeploymentEdition.IncludesBranchReports)
+            chkNewYear.Focus();
+        else
+            btnApplyPermissionChanges.Focus();
     }
     #endregion
 

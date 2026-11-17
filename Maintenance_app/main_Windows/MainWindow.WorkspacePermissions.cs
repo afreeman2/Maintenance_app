@@ -21,7 +21,8 @@ public partial class MainWindow
         SupportEmployeesMenu.IsEnabled = user?.foremp == true;
         SupportManagementsMenu.IsEnabled = SupportSectionsMenu.IsEnabled = user?.mang_check == true;
         report_mnue.IsEnabled = statistics_mnue.IsEnabled = user?.formaintrepo == true;
-        BranchReportsMenu.IsEnabled = user?.branch_report == true;
+        // تبقى صلاحية الحساب شرطًا إضافيًا عندما تكون ميزة التقارير متاحة في النسخة.
+        BranchReportsMenu.IsEnabled = DeploymentEdition.IncludesBranchReports && user?.branch_report == true;
         opt.IsEnabled = user?.foruser == true;
         // نماذج الفحص اليومية وكلمة مرور الحساب متاحة للمستخدم المسجّل وفق السلوك المعتمد.
         DailyInspectionMenu.IsEnabled = DailyInspectionSERVICEMenu.IsEnabled = cha.IsEnabled = user is not null;
@@ -57,7 +58,9 @@ public partial class MainWindow
         BindWorkspaceShortcut(SupportManagementsMenu, Key.D4, ModifierKeys.Control, Key.NumPad4);
         BindWorkspaceShortcut(SupportSectionsMenu, Key.D5, ModifierKeys.Control, Key.NumPad5);
         BindWorkspaceShortcut(report_mnue, Key.C, ModifierKeys.Control);
-        BindWorkspaceShortcut(BranchReportsMenu, Key.T, ModifierKeys.Alt);
+        // لا يُسجّل اختصار التقارير المجمّعة في نسخة الفروع.
+        if (DeploymentEdition.IncludesBranchReports)
+            BindWorkspaceShortcut(BranchReportsMenu, Key.T, ModifierKeys.Alt);
         BindWorkspaceShortcut(statistics_mnue, Key.I, ModifierKeys.Control);
         BindWorkspaceShortcut(DailyInspectionMenu, Key.Y, ModifierKeys.Alt);
         BindWorkspaceShortcut(DailyInspectionSERVICEMenu, Key.X, ModifierKeys.Alt);

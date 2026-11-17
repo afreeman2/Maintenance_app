@@ -1,9 +1,15 @@
 ﻿param(
-    [string]$OutputDirectory = (Join-Path (Split-Path $PSScriptRoot -Parent) 'output\MaintenanceSetup')
+    [string]$OutputDirectory,
+    [switch]$BranchEdition
 )
 
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
+# يكون للمثبّت المخصص للفروع اسم ومسار افتراضيان مستقلان عن حزمة الإدارة.
+if (!$OutputDirectory) {
+    $OutputDirectory = if ($BranchEdition) { Join-Path $root 'setup' } else { Join-Path $root 'output\MaintenanceSetup' }
+}
+$installerName = if ($BranchEdition) { 'Setup-Branches.exe' } else { 'Setup.exe' }
 $appProject = Join-Path $root 'Maintenance_app\Maintenance_app.csproj'
 $setupProject = Join-Path $PSScriptRoot 'Setup\Setup.csproj'
 $work = Join-Path ([IO.Path]::GetTempPath()) ('maintenance-setup-' + [Guid]::NewGuid().ToString('N'))
@@ -16,6 +22,11 @@ $publish = @('publish', '-c', 'Release', '-r', 'win-x64', '--self-contained', 't
     '-p:RuntimeFrameworkVersion=10.0.14', '-p:DebugType=None', '-p:DebugSymbols=false',
     '-p:TargetPlatformDisplayName=Windows', '-p:NuGetAudit=false', '--ignore-failed-sources')
 
+# يعزل بناء الفروع مخرجاته الوسيطة والتنفيذية عن مخرجات Release الخاصة بالإدارة.
+if ($BranchEdition) {
+    $publish += @('-p:MaintenanceBranchEdition=true', '--artifacts-path', (Join-Path $work 'Build'))
+}
+
 try {
     New-Item -ItemType Directory -Path $work -Force | Out-Null
     & dotnet @publish $appProject -p:Platform=x64 -o $app
@@ -26,6 +37,15 @@ try {
     $legacyConnection = Join-Path $app 'ConectionString'
     if (Test-Path -LiteralPath $legacyConnection) {
         Remove-Item -LiteralPath $legacyConnection
+    }
+
+    # تُستبعد قوالب التقارير المجمّعة حصريًا عند توزيع نسخة الفروع.
+    if ($BranchEdition) {
+        foreach ($report in 'Maint_grop_Branch.repx', 'Maint_grop_HeadersByBranch.repx') {
+            if (Test-Path -LiteralPath (Join-Path $app ('Reports\' + $report))) {
+                throw "Unexpected administration report in branch edition: $report"
+            }
+        }
     }
 
     # يفشل بناء الحزمة عند فقدان أحد قوالب الطباعة التي تُقرأ أثناء التشغيل.
@@ -44,7 +64,7 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Setup publish failed.' }
 
     New-Item -ItemType Directory -Path $OutputDirectory -Force | Out-Null
-    $installer = Join-Path $OutputDirectory 'Setup.exe'
+    $installer = Join-Path $OutputDirectory $installerName
     Copy-Item -LiteralPath (Join-Path $setup 'MaintenanceSetup.exe') -Destination $installer -Force
     Get-FileHash -LiteralPath $installer -Algorithm SHA256
 }

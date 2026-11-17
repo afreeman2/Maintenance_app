@@ -7,14 +7,18 @@ namespace Maintenance_app.converts
 {
     public sealed class UserPermissionCountConverter : IMultiValueConverter
     {
+        #region عد الصلاحيات المعروضة
+
         public object Convert(
             object[] values,
             Type targetType,
             object parameter,
             CultureInfo culture)
         {
-            int enabledCount = values.Count(value => value is bool isEnabled && isEnabled);
-            return $"الصلاحيات المفعّلة: {enabledCount} من {values.Length}";
+            // الربط الأخير خاص بتقارير الفروع، ويُحسب في نسخة الإدارة فقط.
+            int availableCount = DeploymentEdition.IncludesBranchReports ? values.Length : Math.Max(0, values.Length - 1);
+            int enabledCount = values.Take(availableCount).Count(value => value is bool isEnabled && isEnabled);
+            return $"الصلاحيات المفعّلة: {enabledCount} من {availableCount}";
         }
 
         public object[] ConvertBack(
@@ -25,6 +29,8 @@ namespace Maintenance_app.converts
         {
             throw new NotSupportedException();
         }
+
+        #endregion
     }
 
 }

@@ -21,6 +21,11 @@
     <Description>منظومة إدارة الخدمات والصيانة</Description>
   </PropertyGroup>
 
+  <!-- يقتصر إخفاء التقارير على الحزمة التي تُبنى صراحةً للفروع. -->
+  <PropertyGroup Condition="'$(MaintenanceBranchEdition)' == 'true'">
+    <DefineConstants>$(DefineConstants);MAINTENANCE_BRANCH_EDITION</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <!-- مورد أيقونة التطبيق للنوافذ وأيقونة ملف التشغيل. -->
     <Resource Include="Resources\maintenance-crossed-tools.ico" />
@@ -90,7 +95,7 @@
     <!-- ملفات مستقلة للتجميع وكشف الرؤوس المختصر، تُنسخ مع التطبيق عند البناء والنشر. -->
     <None Update="Reports\Maint_grop_date.repx;Reports\Maint_grop_Build.repx;Reports\Maint_grop_Technician.repx;Reports\Maint_grop_HeaderOnly.repx" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <!-- كشف الفروع التفصيلي وجدول الرؤوس المجمع بالفرع يرافقان نسخ التشغيل والنشر. -->
-    <None Update="Reports\Maint_grop_Branch.repx;Reports\Maint_grop_HeadersByBranch.repx" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Update="Reports\Maint_grop_Branch.repx;Reports\Maint_grop_HeadersByBranch.repx" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" Condition="'$(MaintenanceBranchEdition)' != 'true'" />
     <!-- قوالب التكليف والمواد والإنهاء ترافق نسخ البناء والنشر. -->
     <None Update="Reports\Mainte_Report.repx;Reports\parts.repx;Reports\Done_Mainte_Report.repx" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <!-- نافذتا الفحص اليومي تقرآن نسختي REPX عند الطباعة. -->
