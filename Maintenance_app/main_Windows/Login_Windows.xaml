@@ -10,7 +10,16 @@
                 xmlns:vm="clr-namespace:Maintenance_app.viewo_Model"   
                  
 x:Class="Maintenance_app.main_Windows.Login_Windows" dx:ThemeManager.ThemeName="Win11Light"
-                 Title="تسجيل الدخول | الخدمات والصيانة" Width="1080" Height="720" MinWidth="900" MinHeight="620" Loaded="MetroWindow_Loaded" WindowStartupLocation="CenterScreen" WindowStyle="None" AllowsTransparency="True" ResizeMode="NoResize" ShowTitleBar="False" ShowCloseButton="False" ShowMinButton="False" ShowMaxRestoreButton="False" TitleAlignment="Center" Background="Transparent" BorderThickness="0" GlowBrush="{x:Null}" FlowDirection="RightToLeft" FontFamily="Segoe UI" FontSize="14" UseLayoutRounding="True" SnapsToDevicePixels="True" TextOptions.TextFormattingMode="Display" Icon="pack://application:,,,/Maintenance_app;component/Resources/maintenance-crossed-tools.ico" WindowButtonCommandsOverlayBehavior="Never" NonActiveGlowBrush="{x:Null}" SizeToContent="Manual">
+                 Title="تسجيل الدخول | الخدمات والصيانة" Width="1080" Height="720" 
+                 MinWidth="900" MinHeight="620" Loaded="MetroWindow_Loaded"
+                 WindowStartupLocation="CenterScreen" WindowStyle="None"
+                 AllowsTransparency="True" ResizeMode="NoResize" ShowTitleBar="False"
+                 ShowCloseButton="False" ShowMinButton="False" ShowMaxRestoreButton="False" 
+                 TitleAlignment="Center" Background="Transparent" BorderThickness="0"
+                 GlowBrush="{x:Null}" FlowDirection="RightToLeft" FontFamily="Segoe UI"
+                 FontSize="14" UseLayoutRounding="True" SnapsToDevicePixels="True" 
+                 TextOptions.TextFormattingMode="Display" Icon="pack://application:,,,/Maintenance_app;component/Resources/maintenance-crossed-tools.ico"
+                 WindowButtonCommandsOverlayBehavior="Never" NonActiveGlowBrush="{x:Null}" SizeToContent="Manual">
     <mah:MetroWindow.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

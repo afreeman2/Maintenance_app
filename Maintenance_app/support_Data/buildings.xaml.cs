@@ -316,7 +316,7 @@ namespace Maintenance_app.support_Data
                 if (string.IsNullOrWhiteSpace(TxtName.SearchText))
                 {
                     TxtName.Tag = 1;
-                    ErrorRule.ErrorMessage = "أدخل بيان الخدمات";
+                    ErrorRule.ErrorMessage = "أدخل اسم المبني";
                     TxtName.GetBindingExpression(TagProperty).UpdateSource();
                     TxtName.Focus();
                     return;
@@ -326,7 +326,7 @@ namespace Maintenance_app.support_Data
                 if (InstitutionExists(name))
                 {
                     TxtName.Tag = 1;
-                    ErrorRule.ErrorMessage = "بيان الخدمات موجود مسبقًا";
+                    ErrorRule.ErrorMessage = "اسم المبني موجود مسبقًا";
                     TxtName.GetBindingExpression(TagProperty).UpdateSource();
                     TxtName.Focus();
                     return;
